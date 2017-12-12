@@ -1,7 +1,7 @@
 ---
 # Local package installation method
 
-- name: Check installation package on local machine
+- name: Check local installation package
   assert:
     that:
       - scale_install_localpkg_path is defined
@@ -19,7 +19,7 @@
   stat: path={{ scale_install_localpkg_tmpdir }}
   register: tmp_dir
 
-- name: Check for temporary directory
+- name: Check temporary directory
   assert:
     that: tmp_dir.stat.isdir is defined and tmp_dir.stat.isdir
     msg: "Please set the variable 'scale_install_localpkg_tmpdir' to point to a temporary directory on the remote system!"
@@ -31,20 +31,20 @@
 
 - name: Read checksum from file
   set_fact:
-    md5_ref: "{{ lookup('file', scale_install_localpkg_path + '.md5') }}"
+    md5_sum: "{{ lookup('file', scale_install_localpkg_path + '.md5') }}"
   when: md5_file.stat.exists
   run_once: true
 
 - name: Compute checksum from installation package
   local_action: stat path="{{ scale_install_localpkg_path }}"
-  register: md5_sum
+  register: install_pkg
   when: md5_file.stat.exists
   run_once: true
 
 - name: Compare checksums
   assert:
     that:
-      - md5_ref.strip().split().0 == md5_sum.stat.md5
+      - md5_sum.strip().split().0 == install_pkg.stat.md5
     msg: "Checksums don't match. Please check integritiy of your local installation package!"
   when: md5_file.stat.exists
   run_once: true
