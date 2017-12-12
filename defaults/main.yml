@@ -1,0 +1,30 @@
+---
+# Default variables for the IBM Spectrum Scale (GPFS) role
+# Either edit this file or define your own variables to override the defaults.
+
+
+## Specify the Spectrum Scale version that you want to install on your nodes
+#scale_version: 4.1.1.0
+
+## Specify the URL of the (existing) Spectrum Scale YUM repository for installation
+#scale_install_repository_url: http://infraserv/gpfs/
+
+## Specify the path to the Spectrum Scale installation package on the remote system
+## (accessible on Ansible managed node)
+#scale_install_remotepkg_path: /path/to/Spectrum_Scale_Standard-...-x86_64-Linux-install
+
+## Specify the path to the Spectrum Scale installation package on the local system
+## (accessible on Ansible control machine) - it will be copied to your nodes
+#scale_install_localpkg_path: /path/to/Spectrum_Scale_Standard-...-x86_64-Linux-install
+
+## Temporary directory to copy installation package to
+scale_install_localpkg_tmpdir: /tmp
+
+
+########################## No editing below this line ##########################
+
+
+## Minimum Spectrum Scale version that this role was tested with
+scale_minversion: 4.1.1
+
+...

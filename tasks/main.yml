@@ -1,0 +1,19 @@
+---
+# Install IBM Spectrum Scale (GPFS)
+
+- import_tasks: scale_check.yml
+  tags: always
+
+- import_tasks: scale_prepare.yml
+  tags: prepare
+
+- import_tasks: scale_install.yml
+  tags: install
+
+# scale_build.yml
+
+# Future:
+# - scale_cluster.yml
+# - scale_storage.yml
+
+...

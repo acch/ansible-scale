@@ -1,0 +1,12 @@
+---
+# Perform sanity check of configuration variables
+
+- name: Check Spectrum Scale version
+  assert:
+    that:
+      - scale_version is defined
+      - scale_version | version_compare(scale_minversion, '>=')
+    msg: "Please set the variable 'scale_version' to the correct version (minimum: {{ scale_minversion }})!"
+  run_once: true
+
+...

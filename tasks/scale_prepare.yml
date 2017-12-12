@@ -1,0 +1,10 @@
+---
+# Prepare node for Installation
+
+# Disable SELinux
+
+# Enable root SSH
+
+# Enable pubkey SSH
+
+...
