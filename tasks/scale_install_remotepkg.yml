@@ -35,15 +35,58 @@
 
 - name: install | Stat extracted packages
   stat: path=/usr/lpp/mmfs/{{ scale_version }}/gpfs_rpms
-  register: scale_install_gpfs_rpms
+  register: scale_install_gpfs_rpmdir
 
 - name: install | Make installation package executable
   file:
     path: "{{ scale_install_remotepkg_path }}"
     mode: a+x
-  when: not scale_install_gpfs_rpms.stat.exists
+  when: not scale_install_gpfs_rpmdir.stat.exists
 
 - name: install | Extract installation package
   command: "{{ scale_install_remotepkg_path + ' --silent' }}"
   args:
     creates: /usr/lpp/mmfs/{{ scale_version }}/gpfs_rpms
+
+- name: install | Stat extracted packages
+  stat: path=/usr/lpp/mmfs/{{ scale_version }}/gpfs_rpms
+  register: scale_install_gpfs_rpmdir
+
+- name: install | Check extracted packages
+  assert:
+    that:
+      - scale_install_gpfs_rpmdir.stat.exists
+      - scale_install_gpfs_rpmdir.stat.isdir
+    msg: "The variable 'scale_version' doesn't seem to match the contents of the remote installation package!"
+
+# Ensure daemon not running
+
+- name: install | Count daemon processes
+  command: pgrep mmfsd
+  register: scale_install_daemonprocs
+  changed_when: false
+  failed_when: false
+
+- name: install | Check daemon processes
+  assert:
+    that: scale_install_daemonprocs.rc == 1
+    msg: "Spectrum Scale is running. Please stop it for an upgrade!"
+
+# Install RPMs
+
+- name: install | Find Global Security Kit (GSKit) RPM
+  find:
+    paths: /usr/lpp/mmfs/{{ scale_version }}/gpfs_rpms/
+    patterns: 'gpfs.gskit-*.{{ scale_architecture }}.rpm'
+  register: scale_install_gpfs_gskit
+
+- name: install | Check valid Global Security Kit (GSKit) RPM
+  assert:
+    that: scale_install_gpfs_gskit.matched > 0
+    msg: "No Global Security Kit (GSKit) RPM found: /usr/lpp/mmfs/{{ scale_version }}/gpfs_rpms/gpfs.gskit-*.{{ scale_architecture }}.rpm"
+
+- name: install | Install GPFS RPMs
+  yum: name=/usr/lpp/mmfs/{{ scale_version }}/gpfs_rpms/{{ item }}.rpm state=present
+  with_items:
+    - "{{ scale_install_gpfs_rpms }}"
+    - "{{ scale_install_gpfs_gskit.files.0.path | basename | regex_replace('.rpm$', '') }}"

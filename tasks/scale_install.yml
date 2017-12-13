@@ -22,7 +22,7 @@
     - scale_install_localpkg_path is defined
   run_once: true
 
-- name: install | Check defined installation method
+- name: install | Check valid installation method
   assert:
     that: scale_installmethod is defined
     msg: "Please set the appropriate variable 'scale_install_*' for your desired installation method!"

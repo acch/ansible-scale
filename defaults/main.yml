@@ -11,11 +11,23 @@
 
 ## Specify the path to the Spectrum Scale installation package on the remote system
 ## (accessible on Ansible managed node)
-#scale_install_remotepkg_path: /path/to/Spectrum_Scale_Standard-...-x86_64-Linux-install
+#scale_install_remotepkg_path: /path/to/Spectrum_Scale_Standard-...-install
 
 ## Specify the path to the Spectrum Scale installation package on the local system
 ## (accessible on Ansible control machine) - it will be copied to your nodes
-#scale_install_localpkg_path: /path/to/Spectrum_Scale_Standard-...-x86_64-Linux-install
+#scale_install_localpkg_path: /path/to/Spectrum_Scale_Standard-...-install
 
 ## Temporary directory to copy installation package to
 scale_install_localpkg_tmpdir: /tmp
+
+
+## Spectrum Scale to install
+scale_architecture: x86_64
+
+## List of GPFS RPMs to install
+scale_install_gpfs_rpms:
+  - gpfs.base-{{ scale_rpmversion }}.{{ scale_architecture }}
+  - gpfs.docs-{{ scale_rpmversion }}.noarch
+  - gpfs.ext-{{ scale_rpmversion }}.{{ scale_architecture }}
+  - gpfs.gpl-{{ scale_rpmversion }}.noarch
+  - gpfs.msg.en_US-{{ scale_rpmversion }}.noarch
