@@ -1,40 +1,49 @@
 ---
 # Remote package installation method
 
-- name: Check for defined installation package
-  assert:
-    that: scale_install_remotepkg_path is defined
-    msg: "Please set the variable 'scale_install_remotepkg_path' to point to the remote installation package!"
-  run_once: true
-
-- name: Stat installation package
+- name: install | Stat remote installation package
   stat: path={{ scale_install_remotepkg_path }}
-  register: install_pkg
+  register: scale_install_remotepkg
 
-- name: Check remote installation package
+- name: install | Check remote installation package
   assert:
-    that: install_pkg.stat.exists
+    that: scale_install_remotepkg.stat.exists
     msg: "Please set the variable 'scale_install_remotepkg_path' to point to the remote installation package!"
 
-- name: Stat checksum file
+# Optionally, verify package checksum
+
+- name: install | Stat checksum file
   stat: path={{ scale_install_remotepkg_path }}.md5
-  register: md5_file
+  register: scale_install_md5_file
 
-- name: Read checksum from file
-  set_fact:
-    md5_sum: "{{ lookup('file', scale_install_remotepkg_path + '.md5') }}"
-  when: md5_file.stat.exists
+- name: install | Read checksum from file
+  slurp: src={{ scale_install_remotepkg_path }}.md5
+  register: scale_install_md5_sum_b64
+  when: scale_install_md5_file.stat.exists
 
-- name: Compare checksums
+- name: install | Decode checksum
+  set_fact: scale_install_md5_sum={{ scale_install_md5_sum_b64.content | b64decode }}
+  when: scale_install_md5_file.stat.exists
+
+- name: install | Compare checksums
   assert:
-    that:
-      - md5_sum.strip().split().0 == install_pkg.stat.md5
-    msg: "Checksums don't match. Please check integritiy of your local installation package!"
-  when: md5_file.stat.exists
+    that: scale_install_md5_sum.strip().split().0 == scale_install_remotepkg.stat.md5
+    msg: "Checksums don't match. Please check integritiy of your remote installation package!"
+  when: scale_install_md5_file.stat.exists
 
-- name: Extract installation package on node
+# Extract installation package
+
+- name: install | Stat extracted packages
+  stat: path=/usr/lpp/mmfs/{{ scale_version }}/gpfs_rpms
+  register: scale_install_gpfs_rpms
+
+- name: install | Make installation package executable
+  file:
+    path: "{{ scale_install_remotepkg_path }}"
+    mode: a+x
+  when: not scale_install_gpfs_rpms.stat.exists
+
+- name: install | Extract installation package
   command: "{{ scale_install_remotepkg_path + ' --silent' }}"
   args:
     creates: /usr/lpp/mmfs/{{ scale_version }}/gpfs_rpms
-
-...
