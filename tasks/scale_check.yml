@@ -1,7 +1,7 @@
 ---
 # Perform sanity check of configuration variables
 
-- name: Check Spectrum Scale version
+- name: check | Check Spectrum Scale version
   assert:
     that:
       - scale_version is defined
