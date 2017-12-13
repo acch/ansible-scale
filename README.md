@@ -1,13 +1,15 @@
-# ansible-scale
+Spectrum-Scale
+==============
 
 Highly-configurable Ansible role to install IBM Spectrum Scale (GPFS)
 
 This project is in very early development. Not ready for production, yet!
 
-## Features
+Features
+--------
 
 - Install IBM Spectrum Scale (GPFS) packages on Linux nodes
-- Optionally, verify package integrity by comparing md5sum
+- Optionally, verify package integrity by comparing md5 checksums
 - Compile Linux kernel extension
 
 The following installation methods are available:
@@ -20,21 +22,24 @@ Future plans:
 - Configure Spectrum Scale storage
 - Configure Spectrum Scale filesystem
 
-## Installation
+Requirements
+------------
 
-Using Git:
+You will need to download the IBM Spectrum Scale (GPFS) packages from the official websites, as there's no public repository available. Visit https://www.ibm.com/support/fixcentral and search for 'IBM Spectrum Scale (Software defined storage)'.
 
-```
-git clone https://github.com/acch/ansible-scale.git roles/scale
-```
+Role Variables
+--------------
 
-Using Ansible-Galaxy:
+Default variables are defined in `defauls/main.yml`. Either edit this file or define your own variables to override the defaults.
 
-```
-TBD
-```
+Note that defining the variable `scale_version` is mandatory. Furthermore, you will need to configure an installation method by defining *one* of the following variables:
 
-## Usage
+- `scale_install_repository_url`
+- `scale_install_remotepkg_path`
+- `scale_install_localpkg_path`
+
+Example Playbook
+----------------
 
 The simplest possible playbook to install IBM Spectrum Scale on a node:
 
@@ -45,16 +50,11 @@ The simplest possible playbook to install IBM Spectrum Scale on a node:
     - scale_version: 4.2.3.4
     - scale_install_localpath: /path/to/SpectrumScaleInstaller
   roles:
-    - scale
+    - spectrum-scale
 ...
 ```
 
-### Configuration
+Copyright and license
+---------------------
 
-Default variables are defined in `defauls/main.yml`. Either edit this file or define your own variables to override the defaults.
-
-Note that defining the variable `scale_version` is mandatory. Furthermore, you will need to configure an installation method by defining one of the following variables:
-
-- `scale_install_repository_url`
-- `scale_install_remotepkg_path`
-- `scale_install_localpkg_path`
+Copyright 2017 Achim Christ, released under the [MIT license](LICENSE)

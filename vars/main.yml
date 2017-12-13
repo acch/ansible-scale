@@ -1,0 +1,7 @@
+---
+# Variables for the IBM Spectrum Scale (GPFS) role
+# These variables are not meant to be overridden
+
+
+## Minimum Spectrum Scale version that this role was tested with
+scale_minversion: 4.1.1

@@ -19,12 +19,3 @@
 
 ## Temporary directory to copy installation package to
 scale_install_localpkg_tmpdir: /tmp
-
-
-########################## No editing below this line ##########################
-
-
-## Minimum Spectrum Scale version that this role was tested with
-scale_minversion: 4.1.1
-
-...
