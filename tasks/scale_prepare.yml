@@ -20,7 +20,7 @@
     regexp: "PermitRootLogin"
     line: "PermitRootLogin yes"
     state: present
-  notify: reload sshd
+  notify: reload-sshd
 
 - name: prepare | Enable SSH pubkey authentication
   lineinfile:
@@ -28,7 +28,9 @@
     regexp: "PubkeyAuthentication"
     line: "PubkeyAuthentication yes"
     state: present
-  notify: reload sshd
+  notify: reload-sshd
+
+- meta: flush_handlers
 
 #
 # Configure SSH client

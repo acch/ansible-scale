@@ -1,2 +1,37 @@
 ---
 # YUM repository installation method
+
+#
+# Configure YUM repository
+#
+- name: install | Configure YUM repository
+  yum_repository:
+    name: spectrum-scale
+    description: IBM Spectrum Scale (GPFS)
+    baseurl: "{{ scale_install_repository_url }}"
+    gpgcheck: no
+    state: present
+
+#
+# Ensure no daemon running
+#
+- name: install | Count daemon processes
+  command: pgrep mmfsd
+  register: scale_install_daemonprocs
+  changed_when: false
+  failed_when: false
+
+- name: install | Check daemon processes
+  assert:
+    that: scale_install_daemonprocs.rc == 1
+    msg: "Spectrum Scale is running. Please stop it for an upgrade!"
+
+#
+# Install RPMs
+#
+- name: install | Install GPFS RPMs
+  yum:
+    name: "{{ item }}"
+    update_cache: yes
+    state: present
+  with_items: "{{ scale_install_gpfs_rpms }}"

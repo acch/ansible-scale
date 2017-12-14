@@ -62,7 +62,7 @@
     msg: "The variable 'scale_version' doesn't seem to match the contents of the remote installation package!"
 
 #
-# Ensure no daemon no running
+# Ensure no daemon running
 #
 - name: install | Count daemon processes
   command: pgrep mmfsd
