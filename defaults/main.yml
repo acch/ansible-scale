@@ -18,12 +18,15 @@
 ## (accessible on Ansible control machine) - it will be copied to your nodes
 #scale_install_localpkg_path: /path/to/Spectrum_Scale_Standard-...-install
 
-## Temporary directory to copy installation package to
-scale_install_localpkg_tmpdir: /tmp
-
 
 ## Spectrum Scale architecture
 scale_architecture: x86_64
+
+## Path to (existing) public SSH key - will be exchanged between nodes
+scale_prepare_pubkey_path: /root/.ssh/id_rsa.pub
+
+## Temporary directory to copy installation package to
+scale_install_localpkg_tmpdir: /tmp
 
 ## List of GPFS RPMs to install
 scale_install_gpfs_rpms:
@@ -33,5 +36,11 @@ scale_install_gpfs_rpms:
   - gpfs.gpl-{{ scale_rpmversion }}.noarch
   - gpfs.msg.en_US-{{ scale_rpmversion }}.noarch
 
-## Path to (existing) public SSH key - will be exchanged between nodes
-scale_prepare_pubkey_path: /root/.ssh/id_rsa.pub
+## List of RPMs to install for building Linux kernel extension
+scale_build_prereqs:
+  - cpp
+  - gcc
+  - gcc-c++
+  - kernel-devel
+  - kernel-headers
+  - make

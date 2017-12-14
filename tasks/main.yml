@@ -10,7 +10,8 @@
 - import_tasks: scale_install.yml
   tags: install
 
-# scale_build.yml
+- import_tasks: scale_build.yml
+  tags: build
 
 # Future:
 # - scale_cluster.yml

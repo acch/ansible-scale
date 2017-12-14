@@ -1,0 +1,23 @@
+---
+# Build Linux kernel extension
+
+#
+# Install prereqs
+#
+- name: build | Install prereqs
+  yum: name={{ item }} state=present
+  with_items: "{{ scale_build_prereqs }}"
+
+- name: build | Compile kernel extension
+  command: /usr/lpp/mmfs/bin/mmbuildgpl --quiet
+  args:
+    creates: /lib/modules/{{ ansible_kernel }}/extra/mmfs26.ko
+
+- name: install | Stat kernel extension
+  stat: path=/lib/modules/{{ ansible_kernel }}/extra/mmfs26.ko
+  register: scale_build_kmod
+
+- name: install | Check kernel extension
+  assert:
+    that: scale_build_kmod.stat.exists
+    msg: "Unable to build Linux kernel extension for running kernel {{ ansible_kernel }}!"
