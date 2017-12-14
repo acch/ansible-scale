@@ -28,6 +28,7 @@
     msg: "Please set the appropriate variable 'scale_install_*' for your desired installation method!"
   run_once: true
 
+#
 # Run chosen installation method
-
+#
 - include_tasks: scale_install_{{ scale_installmethod }}.yml

@@ -1,2 +1,14 @@
 ---
 # Handlers for the IBM Spectrum Scale (GPFS) role
+
+#
+# Reboot server
+#
+- name: reboot
+  fail: msg="A server reboot is required!"
+
+#
+# Restart services
+#
+- name: reload sshd
+  service: name=sshd state=reloaded

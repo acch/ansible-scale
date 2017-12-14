@@ -32,3 +32,6 @@ scale_install_gpfs_rpms:
   - gpfs.ext-{{ scale_rpmversion }}.{{ scale_architecture }}
   - gpfs.gpl-{{ scale_rpmversion }}.noarch
   - gpfs.msg.en_US-{{ scale_rpmversion }}.noarch
+
+## Path to (existing) public SSH key - will be exchanged between nodes
+scale_prepare_pubkey_path: /root/.ssh/id_rsa.pub
