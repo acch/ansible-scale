@@ -1,5 +1,5 @@
-Spectrum-Scale
-==============
+IBM Spectrum Scale (GPFS) Ansible Role
+======================================
 
 Highly-configurable Ansible role to install IBM Spectrum Scale (GPFS)
 
@@ -9,13 +9,13 @@ Features
 --------
 
 - Install IBM Spectrum Scale (GPFS) packages on Linux nodes
-- Optionally, verify package integrity by comparing md5 checksums
+- Optionally, verify package integrity by comparing checksums
 - Perform (offline) upgrade if daemon is stopped
 - Configure SSH pubkey authentication
 - Compile Linux kernel extension
 
 The following installation methods are available:
-- ~~~Install from (existing) YUM repository~~~
+- Install from (existing) YUM repository
 - Install from remote installation package (accessible on Ansible managed node)
 - Install from local installation package (accessible on Ansible control machine)
 
