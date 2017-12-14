@@ -10,8 +10,9 @@
     that: scale_install_remotepkg.stat.exists
     msg: "Please set the variable 'scale_install_remotepkg_path' to point to the remote installation package!"
 
+#
 # Optionally, verify package checksum
-
+#
 - name: install | Stat checksum file
   stat: path={{ scale_install_remotepkg_path }}.md5
   register: scale_install_md5_file
@@ -31,8 +32,9 @@
     msg: "Checksums don't match. Please check integritiy of your remote installation package!"
   when: scale_install_md5_file.stat.exists
 
+#
 # Extract installation package
-
+#
 - name: install | Stat extracted packages
   stat: path=/usr/lpp/mmfs/{{ scale_version }}/gpfs_rpms
   register: scale_install_gpfs_rpmdir
@@ -59,8 +61,9 @@
       - scale_install_gpfs_rpmdir.stat.isdir
     msg: "The variable 'scale_version' doesn't seem to match the contents of the remote installation package!"
 
-# Ensure daemon not running
-
+#
+# Ensure no daemon no running
+#
 - name: install | Count daemon processes
   command: pgrep mmfsd
   register: scale_install_daemonprocs
@@ -72,8 +75,9 @@
     that: scale_install_daemonprocs.rc == 1
     msg: "Spectrum Scale is running. Please stop it for an upgrade!"
 
+#
 # Install RPMs
-
+#
 - name: install | Find Global Security Kit (GSKit) RPM
   find:
     paths: /usr/lpp/mmfs/{{ scale_version }}/gpfs_rpms/
