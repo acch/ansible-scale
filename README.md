@@ -10,6 +10,7 @@ Features
 
 - Install IBM Spectrum Scale (GPFS) packages on Linux nodes
 - Optionally, verify package integrity by comparing md5 checksums
+- Perform (offline) upgrade if daemon is stopped
 - Compile Linux kernel extension
 
 The following installation methods are available:
