@@ -6,6 +6,7 @@
 ## Specify the Spectrum Scale version that you want to install on your nodes
 #scale_version: 4.1.1.0
 
+
 ## Specify the URL of the (existing) Spectrum Scale YUM repository for installation
 #scale_install_repository_url: http://infraserv/gpfs/
 
@@ -21,7 +22,7 @@
 scale_install_localpkg_tmpdir: /tmp
 
 
-## Spectrum Scale to install
+## Spectrum Scale architecture
 scale_architecture: x86_64
 
 ## List of GPFS RPMs to install

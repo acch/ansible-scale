@@ -1,8 +1,10 @@
 ---
-# Prepare node for Installation
+# Prepare node for installation
 
 # Disable SELinux
 
 # Enable root SSH
 
 # Enable pubkey SSH
+
+# Exchange SSH keys
