@@ -24,6 +24,13 @@ Future plans:
 - Configure Spectrum Scale storage
 - Configure Spectrum Scale filesystem
 
+Installation
+------------
+
+```
+$ ansible-galaxy install acch.spectrum-scale
+```
+
 Requirements
 ------------
 
@@ -52,7 +59,7 @@ The simplest possible playbook to install IBM Spectrum Scale on a node:
     - scale_version: 4.2.3.4
     - scale_install_localpath: /path/to/Spectrum_Scale_Standard-4.2.3.4-x86_64-Linux-install
   roles:
-    - spectrum-scale
+    - acch.spectrum-scale
 ```
 
 Refer to `defauls/main.yml` for a detailed explanation of possible variables and configuration options.
