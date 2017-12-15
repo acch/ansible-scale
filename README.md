@@ -10,9 +10,10 @@ Features
 
 - Install IBM Spectrum Scale (GPFS) packages on Linux nodes
 - Optionally, verify package integrity by comparing checksums
-- Perform (offline) upgrade if daemon is stopped
 - Configure SSH pubkey authentication
 - Compile Linux kernel extension
+- Create new cluster or extend existing cluster
+- Perform (offline) upgrade if daemon is stopped
 
 The following installation methods are available:
 - Install from (existing) YUM repository
