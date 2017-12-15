@@ -8,3 +8,8 @@
       - scale_version | version_compare(scale_minversion, '>=')
     msg: "Please set the variable 'scale_version' to the correct version (minimum: {{ scale_minversion }})!"
   run_once: true
+
+- name: check | Check Spectrum Scale architecture
+  assert:
+    that: ansible_architecture == scale_architecture
+    msg: "Please set the variable 'scale_architecture' to the correct architecture (found: {{ ansible_architecture }})!"
