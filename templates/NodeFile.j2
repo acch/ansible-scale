@@ -1,3 +1,4 @@
 {% for host in groups.scale_cluster_candidates %}
-{{ hostvars[host].scale_cluster_daemon_nodename }}:quorum-manager
+{{ hostvars[host].scale_cluster_daemon_nodename }}:{% if hostvars[host].scale_cluster_quorum %}quorum{% else %}nonquorum{% endif %}-{% if hostvars[host].scale_cluster_manager %}manager{% else %}client{% endif %}
+
 {% endfor %}

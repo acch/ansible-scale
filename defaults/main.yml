@@ -46,8 +46,14 @@ scale_build_prereqs:
   - kernel-headers
   - make
 
+## Default cluster name
+scale_cluster_clustername: gpfs1.local
+
 ## Daemon nodename (defaults to node's hostname)
 scale_cluster_daemon_nodename: "{{ ansible_hostname }}"
 
-## Cluster name
-scale_cluster_clustername: gpfs1.local
+## Default quorum role
+scale_cluster_quorum: false
+
+## Default manager role
+scale_cluster_manager: false

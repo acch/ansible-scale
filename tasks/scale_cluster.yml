@@ -2,10 +2,20 @@
 # Create cluster with nodes
 
 - name: cluster | Set default daemon nodename
-  set_fact:
-    scale_cluster_daemon_nodename: "{{ scale_cluster_daemon_nodename }}"
+  set_fact: scale_cluster_daemon_nodename={{ scale_cluster_daemon_nodename }}
   when: hostvars[inventory_hostname].scale_cluster_daemon_nodename is undefined
 
+- name: cluster | Set default quorum role
+  set_fact: scale_cluster_quorum={{ scale_cluster_quorum }}
+  when: hostvars[inventory_hostname].scale_cluster_quorum is undefined
+
+- name: cluster | Set default manager role
+  set_fact: scale_cluster_manager={{ scale_cluster_manager }}
+  when: hostvars[inventory_hostname].scale_cluster_manager is undefined
+
+#
+# Inspect existing cluster
+#
 - name: cluster | Find existing cluster
   shell: "/usr/lpp/mmfs/bin/mmlscluster -Y | grep -v HEADER | grep clusterSummary | cut -d ':' -f 8"
   register: scale_cluster_clusterId
@@ -32,6 +42,18 @@
   changed_when: false
 
 #
+# Check sufficient quorum nodes
+#
+- name: cluster | Count node roles
+  set_fact:
+    scale_cluster_quorum_nodes: "[ {% for host in ansible_play_hosts %}{% if hostvars[host].scale_cluster_quorum %}'{{ host  }}', {% endif %}{% endfor %} ]"
+    scale_cluster_manager_nodes: "[ {% for host in ansible_play_hosts %}{% if hostvars[host].scale_cluster_manager %}'{{ host }}', {% endif %}{% endfor %} ]"
+  run_once: true
+  delegate_to: localhost
+
+- debug: var=scale_cluster_quorum_nodes
+
+#
 # Create new cluster
 #
 - block:
@@ -50,6 +72,16 @@
 #
 # Extend existing cluster
 #
+#- block:
+#    - name: cluster | Count quorum nodes
+#      command: /usr/lpp/mmfs/bin/mmlsnode -N quorumNodes
+#      register: scale_cluster_quorumNodes
+#      changed_when: false
+#      failed_when: false
+#  when:
+#    - groups['scale_cluster_members'] is defined
+#    - groups['scale_cluster_candidates'] is defined
+
 - block:
     - name: cluster | Prepare NodeFile
       template: src=NodeFile.j2 dest=/var/tmp/NodeFile
