@@ -13,7 +13,9 @@
 - import_tasks: scale_build.yml
   tags: build
 
+- import_tasks: scale_cluster.yml
+  tags: cluster
+
 # Future:
-# - scale_cluster.yml
 # - scale_storage.yml
 # - scale_filesystem.yml

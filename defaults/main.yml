@@ -20,7 +20,7 @@
 #scale_install_localpkg_path: /path/to/Spectrum_Scale_Standard-...-install
 
 
-## Spectrum Scale architecture
+## Specify the Spectrum Scale architecture that you want to install on your nodes
 scale_architecture: x86_64
 
 ## Path to (existing) public SSH key - will be exchanged between nodes
@@ -45,3 +45,9 @@ scale_build_prereqs:
   - kernel-devel
   - kernel-headers
   - make
+
+## Daemon nodename (defaults to node's hostname)
+scale_cluster_daemon_nodename: "{{ ansible_hostname }}"
+
+## Cluster name
+scale_cluster_clustername: gpfs1.local

@@ -6,3 +6,13 @@
 
 - name: reload-sshd
   service: name=sshd state=reloaded
+
+- name: accept-server-licenses
+  command: /usr/lpp/mmfs/bin/mmchlicense server --accept -N serverLicense
+  listen: accept-licenses
+  failed_when: false
+
+- name: accept-client-licenses
+  command: /usr/lpp/mmfs/bin/mmchlicense client --accept -N clientLicense
+  listen: accept-licenses
+  failed_when: false

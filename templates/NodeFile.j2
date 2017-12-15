@@ -1,0 +1,3 @@
+{% for host in groups.scale_cluster_candidates %}
+{{ hostvars[host].scale_cluster_daemon_nodename }}:quorum-manager
+{% endfor %}
