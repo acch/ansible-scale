@@ -3,7 +3,7 @@
 
 - block:  ## run_once: true
   - name: install | Stat local installation package
-    local_action: stat path={{ scale_install_localpkg_path }}
+    stat: path={{ scale_install_localpkg_path }}
     register: scale_install_localpkg
 
   - name: install | Check local installation package
@@ -15,7 +15,7 @@
 # Optionally, verify package checksum
 #
   - name: install | Stat checksum file
-    local_action: stat path={{ scale_install_localpkg_path }}.md5
+    stat: path={{ scale_install_localpkg_path }}.md5
     register: scale_install_md5_file
 
   - block:  ## when: scale_install_md5_file.stat.exists
@@ -29,6 +29,7 @@
         msg: "Checksums don't match. Please check integritiy of your local installation package!"
     when: scale_install_md5_file.stat.exists
   run_once: true
+  delegate_to: localhost
 
 #
 # Check temporary directory
