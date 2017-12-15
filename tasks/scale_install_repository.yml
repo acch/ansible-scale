@@ -34,4 +34,6 @@
     name: "{{ item }}"
     update_cache: yes
     state: present
-  with_items: "{{ scale_install_gpfs_rpms }}"
+  with_items:
+    - "{{ scale_install_gpfs_rpms }}"
+    - gpfs.gskit
