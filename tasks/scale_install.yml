@@ -2,28 +2,28 @@
 # Choose installation method from configuration variables
 
 - block:  ## run_once: true
-  - name: install | Check for repository installation method
-    set_fact: scale_installmethod="repository"
-    when:
-      - scale_install_repository_url is defined
+    - name: install | Check for repository installation method
+      set_fact: scale_installmethod="repository"
+      when:
+        - scale_install_repository_url is defined
 
-  - name: install | Check for remotepkg installation method
-    set_fact: scale_installmethod="remotepkg"
-    when:
-      - scale_install_repository_url is undefined
-      - scale_install_remotepkg_path is defined
+    - name: install | Check for remotepkg installation method
+      set_fact: scale_installmethod="remotepkg"
+      when:
+        - scale_install_repository_url is undefined
+        - scale_install_remotepkg_path is defined
 
-  - name: install | Check for localpkg installation method
-    set_fact: scale_installmethod="localpkg"
-    when:
-      - scale_install_repository_url is undefined
-      - scale_install_remotepkg_path is undefined
-      - scale_install_localpkg_path is defined
+    - name: install | Check for localpkg installation method
+      set_fact: scale_installmethod="localpkg"
+      when:
+        - scale_install_repository_url is undefined
+        - scale_install_remotepkg_path is undefined
+        - scale_install_localpkg_path is defined
 
-  - name: install | Check valid installation method
-    assert:
-      that: scale_installmethod is defined
-      msg: "Please set the appropriate variable 'scale_install_*' for your desired installation method!"
+    - name: install | Check valid installation method
+      assert:
+        that: scale_installmethod is defined
+        msg: "Please set the appropriate variable 'scale_install_*' for your desired installation method!"
   run_once: true
   delegate_to: localhost
 

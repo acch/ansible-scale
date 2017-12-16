@@ -8,6 +8,9 @@
   yum: name={{ item }} state=present
   with_items: "{{ scale_build_prereqs }}"
 
+#
+# Build kernel extension
+#
 - name: build | Compile kernel extension
   command: /usr/lpp/mmfs/bin/mmbuildgpl --quiet
   args:

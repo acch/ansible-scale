@@ -44,10 +44,11 @@
 #
 # Check sufficient quorum nodes
 #
-- name: cluster | Count node roles
-  set_fact:
-    scale_cluster_quorum_nodes: "[ {% for host in ansible_play_hosts %}{% if hostvars[host].scale_cluster_quorum %}'{{ host  }}', {% endif %}{% endfor %} ]"
-    scale_cluster_manager_nodes: "[ {% for host in ansible_play_hosts %}{% if hostvars[host].scale_cluster_manager %}'{{ host }}', {% endif %}{% endfor %} ]"
+- block:
+    - name: cluster | Count node roles
+      set_fact:
+        scale_cluster_quorum_nodes: "[ {% for host in ansible_play_hosts %}{% if hostvars[host].scale_cluster_quorum %}'{{ host  }}', {% endif %}{% endfor %} ]"
+        scale_cluster_manager_nodes: "[ {% for host in ansible_play_hosts %}{% if hostvars[host].scale_cluster_manager %}'{{ host }}', {% endif %}{% endfor %} ]"
   run_once: true
   delegate_to: localhost
 
