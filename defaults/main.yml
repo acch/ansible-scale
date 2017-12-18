@@ -52,8 +52,8 @@ scale_cluster_clustername: gpfs1.local
 ## Daemon nodename (defaults to node's hostname)
 scale_cluster_daemon_nodename: "{{ ansible_hostname }}"
 
-## Default quorum role
+## Node's default quorum role - you'll likely want to define per-node roles in your inventory
 scale_cluster_quorum: false
 
-## Default manager role
+## Node's default manager role - you'll likely want to define per-node roles in your inventory
 scale_cluster_manager: false
