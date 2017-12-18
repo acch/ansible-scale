@@ -55,6 +55,6 @@
 - name: prepare | Authorize all SSH keys
   authorized_key:
     user: root
-    key: "{{ item.value.scale_prepare_pubkey }}"
+    key: "{{ hostvars[item].scale_prepare_pubkey }}"
     state: present
-  with_dict: "{{ hostvars }}"
+  with_items: "{{ ansible_play_hosts }}"
