@@ -14,8 +14,10 @@
   when: hostvars[inventory_hostname].scale_cluster_manager is undefined
 
 #
-# Inspect existing cluster
+# Inspect existing cluster and inventory
 #
+- meta: refresh_inventory
+
 - name: cluster | Find existing cluster
   shell: "/usr/lpp/mmfs/bin/mmlscluster -Y | grep -v HEADER | grep clusterSummary | cut -d ':' -f 8"
   register: scale_cluster_clusterId
@@ -41,60 +43,57 @@
   with_items: "{{ ansible_play_hosts }}"
   changed_when: false
 
-#
-# Check sufficient quorum nodes
-#
-- block:
-    - name: cluster | Count node roles
-      set_fact:
-        scale_cluster_quorum_nodes: "[ {% for host in ansible_play_hosts %}{% if hostvars[host].scale_cluster_quorum %}'{{ host  }}', {% endif %}{% endfor %} ]"
-        scale_cluster_manager_nodes: "[ {% for host in ansible_play_hosts %}{% if hostvars[host].scale_cluster_manager %}'{{ host }}', {% endif %}{% endfor %} ]"
-  run_once: true
-  delegate_to: localhost
+- name: cluster | Find quorum nodes
+  add_host:
+    name: "{{ item }}"
+    groups: scale_cluster_quorum_nodes
+  when:
+    - hostvars[item].scale_cluster_quorum | bool
+  with_items: "{{ ansible_play_hosts }}"
+  changed_when: false
 
-- debug: var=scale_cluster_quorum_nodes
+#
+# Assign default quorum nodes
+#
+- name: cluster | Assign default quorum nodes
+  set_fact: scale_cluster_quorum=true
+  when: groups['scale_cluster_quorum_nodes'] is undefined
+  with_sequence: start=1 end={{ [ansible_play_hosts | length, 7] | min }}
+  run_once: true
+  delegate_to: "{{ ansible_play_hosts[item | int - 1] }}"
+  delegate_facts: true
 
 #
 # Create new cluster
 #
-- block:
-    - name: cluster | Prepare NodeFile
+- block:  ## run_once: true
+    - name: cluster | Prepare new cluster NodeFile
       template: src=NodeFile.j2 dest=/var/tmp/NodeFile
 
     - name: cluster | Create new cluster
       command: /usr/lpp/mmfs/bin/mmcrcluster -N /var/tmp/NodeFile -C {{ scale_cluster_clustername }}
       notify: accept-licenses
   when:
-    - groups['scale_cluster_members'] is undefined
     - groups['scale_cluster_candidates'] is defined
+    - groups['scale_cluster_members'] is undefined
   run_once: true
-  delegate_to: "{{ groups.scale_cluster_candidates.0 }}"
+  delegate_to: "{{ groups['scale_cluster_candidates'].0 }}"
 
 #
 # Extend existing cluster
 #
-#- block:
-#    - name: cluster | Count quorum nodes
-#      command: /usr/lpp/mmfs/bin/mmlsnode -N quorumNodes
-#      register: scale_cluster_quorumNodes
-#      changed_when: false
-#      failed_when: false
-#  when:
-#    - groups['scale_cluster_members'] is defined
-#    - groups['scale_cluster_candidates'] is defined
-
-- block:
-    - name: cluster | Prepare NodeFile
+- block:  ## run_once: true
+    - name: cluster | Prepare existing cluster NodeFile
       template: src=NodeFile.j2 dest=/var/tmp/NodeFile
 
     - name: cluster | Add new node(s) to cluster
       command: /usr/lpp/mmfs/bin/mmaddnode -N /var/tmp/NodeFile
       notify: accept-licenses
   when:
-    - groups['scale_cluster_members'] is defined
     - groups['scale_cluster_candidates'] is defined
+    - groups['scale_cluster_members'] is defined
   run_once: true
-  delegate_to: "{{ groups.scale_cluster_members.0 }}"
+  delegate_to: "{{ groups['scale_cluster_members'].0 }}"
 
 
-# mmstartup -a
+# TODO: mmstartup -a
