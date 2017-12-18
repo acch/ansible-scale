@@ -27,7 +27,7 @@ scale_architecture: x86_64
 scale_prepare_pubkey_path: /root/.ssh/id_rsa.pub
 
 ## Temporary directory to copy installation package to
-scale_install_localpkg_tmpdir: /tmp
+scale_install_localpkg_tmpdir_path: /tmp
 
 ## List of GPFS RPMs to install
 scale_install_gpfs_rpms:
