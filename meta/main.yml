@@ -1,6 +1,6 @@
 galaxy_info:
   author: Achim Christ
-  description: Highly-configurable Ansible role to install IBM Spectrum Scale (GPFS)
+  description: Highly-customizable Ansible role for installing and configuring IBM Spectrum Scale (GPFS)
   license: MIT
   min_ansible_version: 2.4
 

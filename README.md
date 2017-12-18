@@ -1,9 +1,9 @@
 IBM Spectrum Scale (GPFS) Ansible Role
 ======================================
 
-Highly-configurable Ansible role to install IBM Spectrum Scale (GPFS)
+Highly-customizable Ansible role for installing and configuring IBM Spectrum Scale (GPFS)
 
-This project is in very early development. Not ready for production, yet!
+This project is in early development... looking for [feedback](https://github.com/acch/ansible-scale/issues/new) and future [requirements](https://github.com/acch/ansible-scale/issues)!
 
 Features
 --------
@@ -21,7 +21,6 @@ The following installation methods are available:
 - Install from local installation package (accessible on Ansible control machine)
 
 Future plans:
-- Configure Spectrum Scale cluster
 - Configure Spectrum Scale storage
 - Configure Spectrum Scale filesystem
 
@@ -35,7 +34,7 @@ $ ansible-galaxy install acch.spectrum-scale
 Requirements
 ------------
 
-You will need to download the Spectrum Scale (GPFS) packages from the IBM website, as there's no public repository available. Visit https://www.ibm.com/support/fixcentral and search for 'IBM Spectrum Scale (Software defined storage)'.
+As there's no public repository available, you will need to download the Spectrum Scale (GPFS) packages from the IBM website. Visit https://www.ibm.com/support/fixcentral and search for 'IBM Spectrum Scale (Software defined storage)'.
 
 Role Variables
 --------------
@@ -63,7 +62,7 @@ The simplest possible playbook to install IBM Spectrum Scale on a node:
     - acch.spectrum-scale
 ```
 
-In reality you'll want to install IBM Spectrum Scale on a number of nodes, and you'll also want to influence the node roles to ensure high-availability. Note that the cluster will be configured with all nodes in the current play:
+In reality you'll want to install IBM Spectrum Scale on a number of nodes, and you'll also want to consider the node roles to ensure high-availability. Note that the cluster will be configured with all nodes in the current play:
 
 ```
 # hosts:
