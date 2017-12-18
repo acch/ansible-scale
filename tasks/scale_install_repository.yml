@@ -37,3 +37,12 @@
   with_items:
     - "{{ scale_install_gpfs_rpms }}"
     - gpfs.gskit
+
+# TODO: online upgrade
+# - block:
+#     - stop GPFS on node
+#     - upgrade GPFS rpms
+#   rescue:
+#     - debug: msg='Can't upgrade GPFS!'
+#   always:
+#     - start GPFS on node
