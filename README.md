@@ -62,7 +62,9 @@ The simplest possible playbook to install IBM Spectrum Scale on a node:
     - acch.spectrum-scale
 ```
 
-In reality you'll want to install IBM Spectrum Scale on a number of nodes, and you'll also want to consider the node roles to ensure high-availability. Note that the cluster will be configured with all nodes in the current play:
+This will install all required packages and create a single-node Spectrum Scale cluster.
+
+In reality you'll want to install Spectrum Scale on a number of nodes, and you'll also want to consider the node roles in order to achieve high-availability. Note that the cluster will be configured with all nodes in the current play:
 
 ```
 # hosts:
@@ -71,6 +73,7 @@ scale01  scale_cluster_quorum=true scale_cluster_manager=true
 scale02  scale_cluster_quorum=true scale_cluster_manager=true
 scale03  scale_cluster_quorum=true scale_cluster_manager=false
 scale04  scale_cluster_quorum=false scale_cluster_manager=false
+scale05  scale_cluster_quorum=false scale_cluster_manager=false
 ```
 ```
 # playbook.yml:
@@ -79,7 +82,7 @@ scale04  scale_cluster_quorum=false scale_cluster_manager=false
   vars:
     - scale_version: 4.2.3.4
     - scale_install_repository_url: http://infraserv/gpfs_rpms/
-    - scale_cluster_clustername: cluster1.example.com
+    - scale_cluster_clustername: cluster01.example.com
   roles:
     - acch.spectrum-scale
 ```
