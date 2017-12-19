@@ -3,7 +3,7 @@ IBM Spectrum Scale (GPFS) Ansible Role
 
 Highly-customizable Ansible role for installing and configuring IBM Spectrum Scale (GPFS)
 
-This project is in early development... looking for [feedback](https://github.com/acch/ansible-scale/issues/new) and future [requirements](https://github.com/acch/ansible-scale/issues)!
+This project is in early development... looking for [feedback](https://github.com/acch/ansible-scale/issues) and future [requirements](https://github.com/acch/ansible-scale/issues/new)!
 
 Features
 --------
@@ -12,7 +12,7 @@ Features
 - Optionally, verify package integrity by comparing checksums
 - Configure SSH public key authentication
 - Compile Linux kernel extension
-- Create new cluster or extend existing cluster
+- Create new-, or extend existing cluster
 - Perform (offline) upgrade if daemon is stopped
 
 The following installation methods are available:
@@ -34,14 +34,14 @@ $ ansible-galaxy install acch.spectrum-scale
 Requirements
 ------------
 
-As there's no public repository available, you will need to download the Spectrum Scale (GPFS) packages from the IBM website. Visit https://www.ibm.com/support/fixcentral and search for 'IBM Spectrum Scale (Software defined storage)'.
+As there's no public repository available, you'll need to download the Spectrum Scale (GPFS) packages from the IBM website. Visit https://www.ibm.com/support/fixcentral and search for 'IBM Spectrum Scale (Software defined storage)'.
 
 Role Variables
 --------------
 
 Default variables are defined in `defaults/main.yml`. You'll also find detailed documentation in that file. Define your own variables to override the defaults.
 
-Note that defining the variable `scale_version` is mandatory. Furthermore, you will need to configure an installation method by defining *one* of the following variables:
+Defining the variable `scale_version` is mandatory. Furthermore, you'll need to configure an installation method by defining *one* of the following variables:
 
 - `scale_install_repository_url`
 - `scale_install_remotepkg_path` (accessible on Ansible managed node)
@@ -64,7 +64,7 @@ The simplest possible playbook to install IBM Spectrum Scale on a node:
 
 This will install all required packages and create a single-node Spectrum Scale cluster.
 
-In reality you'll want to install Spectrum Scale on a number of nodes, and you'll also want to consider the node roles in order to achieve high-availability. Note that the cluster will be configured with all nodes in the current play:
+In reality you'll most probably want to install Spectrum Scale on a number of nodes, and you'll also want to consider the node roles in order to achieve high-availability. The cluster will be configured with all hosts in the current play:
 
 ```
 # hosts:
@@ -86,6 +86,10 @@ scale05  scale_cluster_quorum=false scale_cluster_manager=false
   roles:
     - acch.spectrum-scale
 ```
+
+Defining node roles such as 'quorum' and 'manager' is optional. If you don't specify any quorum nodes then the first seven hosts in your inventory will automatically be assigned the quorum role.
+
+The above examples will install required packages and create a functional Spectrum Scale cluster which can be used to e.g. mount existing remote filesystems.
 
 Refer to `defaults/main.yml` for a detailed explanation of possible variables and configuration options.
 
