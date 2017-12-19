@@ -70,26 +70,27 @@
   failed_when: false
 
 - name: install | Check daemon processes
-  assert:
-    that: scale_install_daemonprocs.rc == 1
-    msg: "Spectrum Scale is running. Please stop it for an upgrade!"
+  debug: msg="Spectrum Scale is running. Please stop it for an upgrade!"
+  when: scale_install_daemonprocs.rc == 0
 
 #
 # Install RPMs
 #
-- name: install | Find Global Security Kit (GSKit) RPM
-  find:
-    paths: /usr/lpp/mmfs/{{ scale_version }}/gpfs_rpms/
-    patterns: 'gpfs.gskit-*.{{ scale_architecture }}.rpm'
-  register: scale_install_gpfs_gskit
+- block:  ## when: scale_install_daemonprocs.rc == 1
+    - name: install | Find Global Security Kit (GSKit) RPM
+      find:
+        paths: /usr/lpp/mmfs/{{ scale_version }}/gpfs_rpms/
+        patterns: 'gpfs.gskit-*.{{ scale_architecture }}.rpm'
+      register: scale_install_gpfs_gskit
 
-- name: install | Check valid Global Security Kit (GSKit) RPM
-  assert:
-    that: scale_install_gpfs_gskit.matched > 0
-    msg: "No Global Security Kit (GSKit) RPM found: /usr/lpp/mmfs/{{ scale_version }}/gpfs_rpms/gpfs.gskit-*.{{ scale_architecture }}.rpm"
+    - name: install | Check valid Global Security Kit (GSKit) RPM
+      assert:
+        that: scale_install_gpfs_gskit.matched > 0
+        msg: "No Global Security Kit (GSKit) RPM found: /usr/lpp/mmfs/{{ scale_version }}/gpfs_rpms/gpfs.gskit-*.{{ scale_architecture }}.rpm"
 
-- name: install | Install GPFS RPMs
-  yum: name=/usr/lpp/mmfs/{{ scale_version }}/gpfs_rpms/{{ item }}.rpm state=present
-  with_items:
-    - "{{ scale_install_gpfs_rpms }}"
-    - "{{ scale_install_gpfs_gskit.files.0.path | basename | regex_replace('.rpm$', '') }}"
+    - name: install | Install GPFS RPMs
+      yum: name=/usr/lpp/mmfs/{{ scale_version }}/gpfs_rpms/{{ item }}.rpm state=present
+      with_items:
+        - "{{ scale_install_gpfs_rpms }}"
+        - "{{ scale_install_gpfs_gskit.files.0.path | basename | regex_replace('.rpm$', '') }}"
+  when: scale_install_daemonprocs.rc == 1
