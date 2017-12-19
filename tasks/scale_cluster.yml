@@ -95,5 +95,13 @@
   run_once: true
   delegate_to: "{{ groups['scale_cluster_members'].0 }}"
 
+- meta: flush_handlers
 
-# TODO: mmstartup -a
+#
+# Start daemons on new nodes
+#
+- name: cluster | Start daemons
+  command: "/usr/lpp/mmfs/bin/mmstartup -N localhost"
+  with_items: "{{ groups['scale_cluster_candidates'] }}"
+  run_once: true
+  delegate_to: "{{ item }}"
