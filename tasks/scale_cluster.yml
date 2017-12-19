@@ -102,6 +102,7 @@
 #
 - name: cluster | Start daemons
   command: "/usr/lpp/mmfs/bin/mmstartup -N localhost"
+  when: groups['scale_cluster_candidates'] is defined
   with_items: "{{ groups['scale_cluster_candidates'] }}"
   run_once: true
   delegate_to: "{{ item }}"
