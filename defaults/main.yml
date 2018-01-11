@@ -36,11 +36,12 @@ scale_install_gpfs_rpms:
   - gpfs.ext-{{ scale_rpmversion }}.{{ scale_architecture }}
   - gpfs.gpl-{{ scale_rpmversion }}.noarch
   - gpfs.msg.en_US-{{ scale_rpmversion }}.noarch
+  # Appropriate gpfs.gskit version will be installed automatically
 
 ## List of RPMs to install for building Linux kernel extension
 scale_build_prereqs:
-  - cpp
-  - gcc
+  #- cpp
+  #- gcc
   - gcc-c++
   - kernel-devel
   - kernel-headers
