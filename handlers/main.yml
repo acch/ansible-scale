@@ -16,3 +16,11 @@
   command: /usr/lpp/mmfs/bin/mmchlicense client --accept -N clientLicense
   listen: accept-licenses
   failed_when: false
+
+- name: wait-daemon-active
+  shell: "/usr/lpp/mmfs/bin/mmgetstate -Y -N localhost | grep -v HEADER | cut -d ':' -f 9"
+  register: state
+  until: state.stdout == "active"
+  retries: 10
+  delay: 30
+  changed_when: false
