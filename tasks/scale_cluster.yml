@@ -16,8 +16,6 @@
 #
 # Inspect existing cluster and inventory
 #
-- meta: refresh_inventory
-
 - name: cluster | Find existing cluster
   shell: "/usr/lpp/mmfs/bin/mmlscluster -Y | grep -v HEADER | grep clusterSummary | cut -d ':' -f 8"
   register: scale_cluster_clusterId
