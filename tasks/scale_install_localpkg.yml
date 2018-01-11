@@ -20,8 +20,7 @@
 
     - block:  ## when: scale_install_md5_file.stat.exists
         - name: install | Read checksum from file
-          set_fact:
-            scale_install_md5_sum: "{{ lookup('file', scale_install_localpkg_path + '.md5') }}"
+          set_fact: scale_install_md5_sum={{ lookup('file', scale_install_localpkg_path + '.md5') }}
 
         - name: install | Compare checksums
           assert:
