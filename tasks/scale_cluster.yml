@@ -104,3 +104,14 @@
   with_items: "{{ groups['scale_cluster_candidates'] }}"
   run_once: true
   delegate_to: "{{ item }}"
+
+#
+# Wait for daemons to become active
+#
+- name: cluster | Wait for daemons
+  shell: "/usr/lpp/mmfs/bin/mmgetstate -Y -N localhost | grep -v HEADER | cut -d ':' -f 9"
+  register: state
+  until: state.stdout == "active"
+  retries: 10
+  delay: 30
+  changed_when: false
