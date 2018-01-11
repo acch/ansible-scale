@@ -94,7 +94,3 @@
         - "{{ scale_install_gpfs_rpms }}"
         - "{{ scale_install_gpfs_gskit.files.0.path | basename | regex_replace('.rpm$', '') }}"
   when: scale_install_daemonprocs.rc == 1
-
-# Continue processing all nodes, even the ones that have failed
-# (they may already have Spectrum Scale installed)
-- meta: refresh_inventory

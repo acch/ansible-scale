@@ -13,6 +13,8 @@
   set_fact: scale_cluster_manager={{ scale_cluster_manager }}
   when: hostvars[inventory_hostname].scale_cluster_manager is undefined
 
+- meta: refresh_inventory
+
 #
 # Inspect existing cluster and inventory
 #

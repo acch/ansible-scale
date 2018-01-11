@@ -49,7 +49,3 @@
 #     - debug: msg='Can't upgrade GPFS!'
 #   always:
 #     - start GPFS on node
-
-# Continue processing all nodes, even the ones that have failed
-# (they may already have Spectrum Scale installed)
-- meta: refresh_inventory
