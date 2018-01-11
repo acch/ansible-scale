@@ -1,7 +1,7 @@
 ---
 # Create cluster with nodes
 
-# Make default variables available in hostvars (for j2 templates)
+# Make default variables available in hostvars
 - name: cluster | Set default quorum role
   set_fact: scale_cluster_quorum={{ scale_cluster_quorum }}
   when: hostvars[inventory_hostname].scale_cluster_quorum is undefined

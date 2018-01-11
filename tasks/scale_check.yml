@@ -8,7 +8,7 @@
       - scale_version | version_compare(scale_minversion, '>=')
     msg: "Please set the variable 'scale_version' to the correct version (minimum: {{ scale_minversion }})!"
 
-# Make default variables available in hostvars (for j2 templates)
+# Make default variables available in hostvars
 - name: check | Set default daemon nodename
   set_fact: scale_daemon_nodename={{ scale_daemon_nodename }}
   when: hostvars[inventory_hostname].scale_daemon_nodename is undefined
