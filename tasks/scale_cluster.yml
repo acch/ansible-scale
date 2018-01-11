@@ -1,10 +1,7 @@
 ---
 # Create cluster with nodes
 
-- name: cluster | Set default daemon nodename
-  set_fact: scale_cluster_daemon_nodename={{ scale_cluster_daemon_nodename }}
-  when: hostvars[inventory_hostname].scale_cluster_daemon_nodename is undefined
-
+# Make default variables available in hostvars (for j2 templates)
 - name: cluster | Set default quorum role
   set_fact: scale_cluster_quorum={{ scale_cluster_quorum }}
   when: hostvars[inventory_hostname].scale_cluster_quorum is undefined
@@ -13,6 +10,7 @@
   set_fact: scale_cluster_manager={{ scale_cluster_manager }}
   when: hostvars[inventory_hostname].scale_cluster_manager is undefined
 
+# Cleanup groups from previous play
 - meta: refresh_inventory
 
 #
@@ -110,6 +108,7 @@
 #
 # Wait for daemons to become active
 #
+# TODO: this should be a handler, only if daemons were started
 - name: cluster | Wait for daemons
   shell: "/usr/lpp/mmfs/bin/mmgetstate -Y -N localhost | grep -v HEADER | cut -d ':' -f 9"
   register: state

@@ -21,7 +21,10 @@
 
 
 ## Specify the Spectrum Scale architecture that you want to install on your nodes
-scale_architecture: x86_64
+scale_architecture: "{{ ansible_architecture }}"
+
+## Daemon nodename (defaults to node's hostname)
+scale_daemon_nodename: "{{ ansible_hostname }}"
 
 ## Path to (existing) public SSH key - will be exchanged between nodes
 scale_prepare_pubkey_path: /root/.ssh/id_rsa.pub
@@ -49,9 +52,6 @@ scale_build_prereqs:
 
 ## Default cluster name
 scale_cluster_clustername: gpfs1.local
-
-## Daemon nodename (defaults to node's hostname)
-scale_cluster_daemon_nodename: "{{ ansible_hostname }}"
 
 ## Node's default quorum role - you'll likely want to define per-node roles in your inventory
 ## Note that if you don't specify any quorum nodes then the first seven hosts in your inventory will automatically be assigned the quorum role, even if this variable is 'false'

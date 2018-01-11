@@ -8,7 +8,7 @@
       - scale_version | version_compare(scale_minversion, '>=')
     msg: "Please set the variable 'scale_version' to the correct version (minimum: {{ scale_minversion }})!"
 
-- name: check | Check Spectrum Scale architecture
-  assert:
-    that: ansible_architecture == scale_architecture
-    msg: "Please set the variable 'scale_architecture' to the correct architecture (found: {{ ansible_architecture }})!"
+# Make default variables available in hostvars (for j2 templates)
+- name: check | Set default daemon nodename
+  set_fact: scale_daemon_nodename={{ scale_daemon_nodename }}
+  when: hostvars[inventory_hostname].scale_daemon_nodename is undefined
