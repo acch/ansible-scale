@@ -16,6 +16,8 @@
 - import_tasks: scale_cluster.yml
   tags: cluster
 
+- import_tasks: scale_storage.yml
+  tags: storage
+
 # Future:
-# - scale_storage.yml
 # - scale_filesystem.yml

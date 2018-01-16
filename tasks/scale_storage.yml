@@ -1,0 +1,62 @@
+---
+# Define Network Shared Disks (NSDs)
+
+#
+# Inspect existing NSDs
+#
+- name: storage | Find existing NSDs
+  shell: "/usr/lpp/mmfs/bin/mmlsnsd -Y | grep -v HEADER | cut -d ':' -f 8"
+  register: scale_storage_nsds
+  changed_when: false
+  failed_when: false
+
+#
+# Create new NSDs
+#
+- block:  ## run_once: true
+    - name: storage | Prepare new NSD StanzaFile
+      template: src=StanzaFile_new.j2 dest=/var/tmp/StanzaFile
+      register: scale_storage_stanzafile
+
+    - block:  ## scale_storage_stanzafile.size > 1
+        - name: storage | Find NSD servers
+          shell: grep servers /var/tmp/StanzaFile | sed 's/^[[:space:]]*servers=//' | sed 's/\"//g' | sed 's/\,/\n/' | sort | uniq | paste -s -d ','
+          register: scale_storage_servers
+          changed_when: false
+          failed_when: false
+
+        - name: storage | Set server license on NSD servers
+          command: /usr/lpp/mmfs/bin/mmchlicense server --accept -N "{{ scale_storage_servers.stdout }}"
+
+        - name: storage | Create new NSDs
+          command: /usr/lpp/mmfs/bin/mmcrnsd -F /var/tmp/StanzaFile
+      when:
+        - scale_storage_stanzafile | changed
+        - scale_storage_stanzafile.size > 1
+
+#
+# Change existing NSDs
+#
+    - name: storage | Prepare existing NSD StanzaFile
+      template: src=StanzaFile_existing.j2 dest=/var/tmp/StanzaFile
+      register: scale_storage_stanzafile
+
+    - block:  ## scale_storage_stanzafile.size > 1
+        - name: storage | Find NSD servers
+          shell: grep servers /var/tmp/StanzaFile | sed 's/^[[:space:]]*servers=//' | sed 's/\"//g' | sed 's/\,/\n/' | sort | uniq | paste -s -d ','
+          register: scale_storage_servers
+          changed_when: false
+          failed_when: false
+
+        - name: storage | Set server license on NSD servers
+          command: /usr/lpp/mmfs/bin/mmchlicense server --accept -N "{{ scale_storage_servers.stdout }}"
+
+        - name: storage | Change existing NSDs
+          command: /usr/lpp/mmfs/bin/mmchnsd -F /var/tmp/StanzaFile
+      when:
+        - scale_storage_stanzafile | changed
+        - scale_storage_stanzafile.size > 1
+  run_once: true
+
+#- name: storage | Reactivate failed NSDs
+#  replace: path=/var/tmp/StanzaFile regexp='^#\s'

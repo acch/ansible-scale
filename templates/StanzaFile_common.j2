@@ -1,0 +1,8 @@
+{% set defaultUsage = 'dataAndMetadata' if nsd.pool | default('system') == 'system' else 'dataOnly' %}
+%nsd:
+  device={{ nsd.device }}
+  nsd={{ nsd.nsd | default('nsd_' + hostvars[host].scale_daemon_nodename + '_' + nsd.device | basename)}}
+  servers={{ nsd.servers | default(hostvars[host].scale_daemon_nodename) }}
+  usage={{ nsd.usage | default(defaultUsage) }}
+  failureGroup={{ nsd.failureGroup | default(-1) }}
+  pool={{ nsd.pool | default('system') }}
