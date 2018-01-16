@@ -43,11 +43,8 @@ scale_install_gpfs_rpms:
 
 ## List of RPMs to install for building Linux kernel extension
 scale_build_prereqs:
-  #- cpp
-  #- gcc
   - gcc-c++
   - kernel-devel
-  - kernel-headers
   - make
 
 ## Default cluster name
