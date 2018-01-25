@@ -1,6 +1,0 @@
-{% for host in vars['play_hosts'] if hostvars[host].scale_storage is defined %}
-{% for nsd in hostvars[host].scale_storage if nsd.device is defined and nsd.nsd | default('nsd_' + hostvars[host].scale_daemon_nodename + '_' + nsd.device | basename) not in scale_storage_nsds.stdout_lines %}
-{% include 'StanzaFile_common.j2' %}
-
-{% endfor %}
-{% endfor %}
