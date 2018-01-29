@@ -27,13 +27,6 @@
         scale_storage_nsddefs: "{{ ansible_play_hosts | map('extract', hostvars, 'scale_storage_nsddefs') | sum(start=[]) }}"
         scale_storage_nsdservers: "{% set nsdservers=ansible_play_hosts | map('extract', hostvars, 'scale_storage_nsdservers') | sum(start=[]) | join(',') %}{{ nsdservers.split(',') | unique }}"
         scale_storage_fsdefs: "{{ ansible_play_hosts | map('extract', hostvars, 'scale_storage') | sum(start=[]) | map(attribute='filesystem') | list | unique }}"
-      run_once: true
-
-#
-# Accept licenses
-#
-    - name: storage | Accept server license for NSD servers
-      command: /usr/lpp/mmfs/bin/mmchlicense server --accept -N "{{ scale_storage_nsdservers | join(',') }}"
 
 #
 # Create new NSDs
@@ -46,12 +39,22 @@
       register: scale_storage_stanzafile_new
       with_items: "{{ scale_storage_fsdefs }}"
 
+    - name: storage | Accept server license for NSD servers
+      command: /usr/lpp/mmfs/bin/mmchlicense server --accept -N "{{ scale_storage_nsdservers | join(',') }}"
+      when:
+        - true in scale_storage_stanzafile_new.results | map(attribute='changed') | list
+        - scale_storage_stanzafile_new.results | sum(attribute='size') > scale_storage_stanzafile_new.results | length
+
     - name: storage | Create new NSDs
       command: /usr/lpp/mmfs/bin/mmcrnsd -F /var/tmp/StanzaFile.new.{{ item.item }}
       when:
         - item | changed
         - item.size > 1
       with_items: "{{ scale_storage_stanzafile_new.results }}"
+
+    - name: storage | Cleanup new NSD StanzaFile(s)
+      file: path=/var/tmp/StanzaFile.new.{{ item }} state=absent
+      with_items: "{{ scale_storage_fsdefs }}"
 
 #
 # Change existing NSDs
@@ -64,10 +67,43 @@
       register: scale_storage_stanzafile_existing
       with_items: "{{ scale_storage_fsdefs }}"
 
-    - name: storage | Change existing NSDs
-      command: /usr/lpp/mmfs/bin/mmchnsd -F /var/tmp/StanzaFile.existing.{{ item.item }}
+    - name: storage | Copy temp existing NSD StanzaFile(s)
+      copy:
+        src: /var/tmp/StanzaFile.existing.{{ item.item }}
+        dest: /var/tmp/StanzaFile.existing.{{ item.item }}.nsd
+        remote_src: yes
       when:
         - item | changed
         - item.size > 1
       with_items: "{{ scale_storage_stanzafile_existing.results }}"
+
+    - name: storage | Adopt temp existing NSD StanzaFile(s)
+      replace:
+        path: /var/tmp/StanzaFile.existing.{{ item.item }}.nsd
+        regexp: '^\s*(usage|failureGroup|pool)=.*\n'
+      when:
+        - item | changed
+        - item.size > 1
+      with_items: "{{ scale_storage_stanzafile_existing.results }}"
+
+    - name: storage | Accept server license for NSD servers
+      command: /usr/lpp/mmfs/bin/mmchlicense server --accept -N "{{ scale_storage_nsdservers | join(',') }}"
+      when:
+        - true in scale_storage_stanzafile_existing.results | map(attribute='changed') | list
+        - scale_storage_stanzafile_existing.results | sum(attribute='size') > scale_storage_stanzafile_existing.results | length
+
+    - name: storage | Change existing NSDs
+      command: /usr/lpp/mmfs/bin/mmchnsd -F /var/tmp/StanzaFile.existing.{{ item.item }}.nsd
+      when:
+        - item | changed
+        - item.size > 1
+      with_items: "{{ scale_storage_stanzafile_existing.results }}"
+
+    - name: storage | Cleanup temp existing NSD StanzaFile(s)
+      file: path=/var/tmp/StanzaFile.existing.{{ item }}.nsd state=absent
+      with_items: "{{ scale_storage_fsdefs }}"
+
+#
+# Prepare stanzas for next run
+#
   run_once: true
