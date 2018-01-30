@@ -15,6 +15,7 @@ Features
 - Create new-, or extend existing cluster
 - Perform (offline) upgrade if daemon is stopped
 - Configure Network Shared Disks (NSDs)
+- Create new-, or extend existing filesystems [WIP]
 
 The following installation methods are available:
 - Install from (existing) YUM repository
@@ -22,7 +23,7 @@ The following installation methods are available:
 - Install from local installation package (accessible on Ansible control machine)
 
 Future plans:
-- Configure filesystems
+- Configure filesystem parameters
 - Manage configuration parameters
 
 Installation
@@ -99,7 +100,7 @@ Refer to `defaults/main.yml` for a detailed explanation of possible variables an
 
 Defining node roles such as 'quorum' and 'manager' is optional. If you don't specify any quorum nodes then the first seven hosts in your inventory will automatically be assigned the quorum role.
 
-The above examples will install required packages and create a functional Spectrum Scale cluster which can be used to e.g. mount existing remote filesystems. To also create filesystems in the new cluster you will need to provide additional information. It's suggested to use `host_vars` inventory files for that purpose:
+The above examples will install required packages and create a functional Spectrum Scale cluster which can be used to e.g. mount existing remote filesystems. To also create local filesystems in the new cluster you will need to provide additional information. It's suggested to use `host_vars` inventory files for that purpose:
 
 ```
 # host_vars/scale01:

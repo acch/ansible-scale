@@ -2,14 +2,34 @@
 # Define Network Shared Disks (NSDs)
 
 #
-# Inspect existing-, and defined NSDs
+# Inspect existing, free, and defined NSDs
 #
-- name: storage | Find existing NSDs
-  shell: "/usr/lpp/mmfs/bin/mmlsnsd -Y | grep -v HEADER | cut -d ':' -f 8"
-  register: scale_storage_nsds
-  changed_when: false
-  failed_when: false
+- block:  ## run_once: true
+    - name: storage | Find existing filesystems
+      shell: "/usr/lpp/mmfs/bin/mmlsfs all -Y | grep -v HEADER | cut -d ':' -f 7 | uniq"
+      register: scale_storage_existing_fs
+      changed_when: false
+      failed_when: false
+
+    - name: storage | Find existing NSDs
+      shell: "/usr/lpp/mmfs/bin/mmlsnsd -a -Y | grep -v HEADER | cut -d ':' -f 8"
+      register: scale_storage_existing_nsds
+      changed_when: false
+      failed_when: false
+
+    - name: storage | Find free NSDs
+      shell: "/usr/lpp/mmfs/bin/mmlsnsd -F -Y | grep -v HEADER | cut -d ':' -f 8"
+      register: scale_storage_free_nsds
+      changed_when: false
+      failed_when: false
   run_once: true
+
+- name: storage | Initialize default variables
+  set_fact:
+    scale_storage: []
+    scale_storage_nsddefs: []
+    scale_storage_nsdservers: []
+  when: scale_storage is undefined
 
 - name: storage | Find defined NSDs
   set_fact:
@@ -31,30 +51,75 @@
 #
 # Create new NSDs
 #
-    - name: storage | Prepare new NSD StanzaFile(s)
+    - name: storage | Prepare StanzaFile(s) for NSD creation
       vars:
         current_fs: "{{ item }}"
-        current_nsds: "{{ scale_storage_nsddefs | difference(scale_storage_nsds.stdout_lines) }}"
+        current_nsds: "{{ scale_storage_nsddefs | difference(scale_storage_existing_nsds.stdout_lines) }}"  ## only non-existing NSDs
       template: src=StanzaFile.j2 dest=/var/tmp/StanzaFile.new.{{ current_fs }}
       register: scale_storage_stanzafile_new
       with_items: "{{ scale_storage_fsdefs }}"
+      changed_when: false
 
     - name: storage | Accept server license for NSD servers
       command: /usr/lpp/mmfs/bin/mmchlicense server --accept -N "{{ scale_storage_nsdservers | join(',') }}"
       when:
-        - true in scale_storage_stanzafile_new.results | map(attribute='changed') | list
         - scale_storage_stanzafile_new.results | sum(attribute='size') > scale_storage_stanzafile_new.results | length
 
     - name: storage | Create new NSDs
       command: /usr/lpp/mmfs/bin/mmcrnsd -F /var/tmp/StanzaFile.new.{{ item.item }}
       when:
-        - item | changed
         - item.size > 1
       with_items: "{{ scale_storage_stanzafile_new.results }}"
 
+#
+# Create new filesystems
+#
+    - name: storage | Prepare StanzaFile(s) for filesystem creation
+      vars:
+        current_fs: "{{ item }}"
+        current_nsds: "{{ scale_storage_nsddefs }}"  ## all defined NSDs
+      template: src=StanzaFile.j2 dest=/var/tmp/StanzaFile.new.{{ current_fs }}
+      register: scale_storage_stanzafile_new
+      when:
+        - current_fs not in scale_storage_existing_fs.stdout_lines
+      with_items: "{{ scale_storage_fsdefs }}"
+      changed_when: false
+
+    - name: storage | Create new filesystems
+      command: /usr/lpp/mmfs/bin/mmcrfs {{ item.item }} -F /var/tmp/StanzaFile.new.{{ item.item }}
+      when:
+        - item.item not in scale_storage_existing_fs.stdout_lines
+        - item.size > 1
+      with_items: "{{ scale_storage_stanzafile_new.results }}"
+
+#
+# Add disks to existing filesystems
+#
+    - name: storage | Prepare StanzaFile(s) for filesystem extension
+      vars:
+        current_fs: "{{ item }}"
+        current_nsds: "{{ scale_storage_nsddefs | difference(scale_storage_existing_nsds.stdout_lines) | union(scale_storage_free_nsds.stdout_lines) }}"  ## only non-existing and free NSDs
+      template: src=StanzaFile.j2 dest=/var/tmp/StanzaFile.new.{{ current_fs }}
+      register: scale_storage_stanzafile_new
+      when:
+        - current_fs in scale_storage_existing_fs.stdout_lines
+      with_items: "{{ scale_storage_fsdefs }}"
+      changed_when: false
+
+    - name: storage | Extend existing filesystems
+      command: /usr/lpp/mmfs/bin/mmadddisk {{ item.item }} -F /var/tmp/StanzaFile.new.{{ item.item }}
+      when:
+        - item.item in scale_storage_existing_fs.stdout_lines
+        - item.size > 1
+      with_items: "{{ scale_storage_stanzafile_new.results }}"
+
+#
+# Cleanup
+#
     - name: storage | Cleanup new NSD StanzaFile(s)
       file: path=/var/tmp/StanzaFile.new.{{ item }} state=absent
       with_items: "{{ scale_storage_fsdefs }}"
+      changed_when: false
 
 #
 # Change existing NSDs
@@ -62,26 +127,28 @@
     - name: storage | Prepare existing NSD StanzaFile(s)
       vars:
         current_fs: "{{ item }}"
-        current_nsds: "{{ scale_storage_nsddefs | intersect(scale_storage_nsds.stdout_lines) }}"
-      template: src=StanzaFile.j2 dest=/var/tmp/StanzaFile.existing.{{ current_fs }}
+        current_nsds: "{{ scale_storage_existing_nsds.stdout_lines }}"
+      template: src=StanzaFile.j2 dest=/var/tmp/StanzaFile.{{ current_fs }}
       register: scale_storage_stanzafile_existing
       with_items: "{{ scale_storage_fsdefs }}"
 
     - name: storage | Copy temp existing NSD StanzaFile(s)
       copy:
-        src: /var/tmp/StanzaFile.existing.{{ item.item }}
-        dest: /var/tmp/StanzaFile.existing.{{ item.item }}.nsd
+        src: /var/tmp/StanzaFile.{{ item.item }}
+        dest: /var/tmp/StanzaFile.{{ item.item }}.nsd
         remote_src: yes
       when:
+        - item.item in scale_storage_existing_fs.stdout_lines
         - item | changed
         - item.size > 1
       with_items: "{{ scale_storage_stanzafile_existing.results }}"
 
     - name: storage | Adopt temp existing NSD StanzaFile(s)
       replace:
-        path: /var/tmp/StanzaFile.existing.{{ item.item }}.nsd
+        path: /var/tmp/StanzaFile.{{ item.item }}.nsd
         regexp: '^\s*(usage|failureGroup|pool)=.*\n'
       when:
+        - item.item in scale_storage_existing_fs.stdout_lines
         - item | changed
         - item.size > 1
       with_items: "{{ scale_storage_stanzafile_existing.results }}"
@@ -93,17 +160,44 @@
         - scale_storage_stanzafile_existing.results | sum(attribute='size') > scale_storage_stanzafile_existing.results | length
 
     - name: storage | Change existing NSDs
-      command: /usr/lpp/mmfs/bin/mmchnsd -F /var/tmp/StanzaFile.existing.{{ item.item }}.nsd
+      command: /usr/lpp/mmfs/bin/mmchnsd -F /var/tmp/StanzaFile.{{ item.item }}.nsd
       when:
+        - item.item in scale_storage_existing_fs.stdout_lines
         - item | changed
         - item.size > 1
       with_items: "{{ scale_storage_stanzafile_existing.results }}"
 
+#
+# Cleanup
+#
     - name: storage | Cleanup temp existing NSD StanzaFile(s)
-      file: path=/var/tmp/StanzaFile.existing.{{ item }}.nsd state=absent
-      with_items: "{{ scale_storage_fsdefs }}"
+      file: path=/var/tmp/StanzaFile.{{ item.item }}.nsd state=absent
+      when:
+        - item.item in scale_storage_existing_fs.stdout_lines
+        - item | changed
+        - item.size > 1
+      with_items: "{{ scale_storage_stanzafile_existing.results }}"
+      changed_when: false
+
+#
+# Change existing disks
+#
+    - name: storage | Change existing disks
+      command: /usr/lpp/mmfs/bin/mmchdisk {{ item.item }} change -F /var/tmp/StanzaFile.{{ item.item }}
+      when:
+        - item.item in scale_storage_existing_fs.stdout_lines
+        - item | changed
+        - item.size > 1
+      with_items: "{{ scale_storage_stanzafile_existing.results }}"
 
 #
 # Prepare stanzas for next run
 #
+    - name: storage | Prepare existing NSD StanzaFile(s) for next run
+      vars:
+        current_fs: "{{ item }}"
+        current_nsds: "{{ scale_storage_nsddefs }}"
+      template: src=StanzaFile.j2 dest=/var/tmp/StanzaFile.{{ current_fs }}
+      with_items: "{{ scale_storage_fsdefs }}"
+      changed_when: false
   run_once: true

@@ -17,7 +17,6 @@
   tags: cluster
 
 - import_tasks: scale_storage.yml
-  when: scale_storage is defined
   tags: storage
 
 # Future:
