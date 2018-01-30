@@ -8,3 +8,7 @@ scale_minversion: 4.1.1
 
 ## Compute RPM version from Spectrum Scale version
 scale_rpmversion: "{{ scale_version | regex_replace('^([0-9.]+)\\.([0-9])$', '\\1-\\2') }}"
+
+## Supported package managers
+scale_pkg_mgr:
+  - yum

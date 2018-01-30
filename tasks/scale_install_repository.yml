@@ -11,6 +11,7 @@
     baseurl: "{{ scale_install_repository_url }}"
     gpgcheck: no
     state: present
+  when: ansible_pkg_mgr == 'yum'
 
 #
 # Ensure no daemon running
@@ -36,6 +37,7 @@
         name: "{{ item }}"
         update_cache: yes
         state: present
+      when: ansible_pkg_mgr == 'yum'
       with_items:
         - "{{ scale_install_gpfs_rpms }}"
         - gpfs.gskit

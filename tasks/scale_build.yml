@@ -6,6 +6,7 @@
 #
 - name: build | Install build prereqs
   yum: name={{ item }} state=present
+  when: ansible_pkg_mgr == 'yum'
   with_items: "{{ scale_build_prereqs }}"
 
 #
