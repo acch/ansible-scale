@@ -67,11 +67,16 @@
 #
 - block:  ## when: groups['scale_cluster_members'] is undefined
     - name: cluster | Prepare new cluster NodeFile
-      template: src=NodeFile.j2 dest=/var/tmp/NodeFile
+      template: src=NodeFile.j2 dest=/var/tmp/NodeFile.new
+      changed_when: false
 
     - name: cluster | Create new cluster
-      command: /usr/lpp/mmfs/bin/mmcrcluster -N /var/tmp/NodeFile -C {{ scale_cluster_clustername }}
+      command: /usr/lpp/mmfs/bin/mmcrcluster -N /var/tmp/NodeFile.new -C {{ scale_cluster_clustername }}
       notify: accept-licenses
+
+    - name: cluster | Cleanup new cluster NodeFile
+      file: path=/var/tmp/NodeFile.new state=absent
+      changed_when: false
   when:
     - groups['scale_cluster_candidates'] is defined
     - groups['scale_cluster_members'] is undefined
@@ -84,11 +89,16 @@
 - block:  ## when: groups['scale_cluster_members'] is defined
     - block:  ## when: groups['scale_cluster_candidates'] is defined
         - name: cluster | Prepare existing cluster NodeFile
-          template: src=NodeFile.j2 dest=/var/tmp/NodeFile
+          template: src=NodeFile.j2 dest=/var/tmp/NodeFile.existing
+          changed_when: false
 
         - name: cluster | Add new node(s) to cluster
-          command: /usr/lpp/mmfs/bin/mmaddnode -N /var/tmp/NodeFile
+          command: /usr/lpp/mmfs/bin/mmaddnode -N /var/tmp/NodeFile.existing
           notify: accept-licenses
+
+        - name: cluster | Cleanup existing cluster NodeFile
+          file: path=/var/tmp/NodeFile.existing state=absent
+          changed_when: false
       when: groups['scale_cluster_candidates'] is defined
 
 #
@@ -116,6 +126,11 @@
   delegate_to: "{{ groups['scale_cluster_members'].0 }}"
 
 - meta: flush_handlers
+
+#
+# TODO: Prepare stanzas for next run
+#
+
 
 #
 # Start daemons on new nodes
