@@ -73,6 +73,8 @@
   debug: msg="Spectrum Scale is running. Please stop it for an upgrade!"
   when: scale_install_daemonprocs.rc == 0
 
+# TODO: If GPFS already installed check version and compare with scale_version
+
 #
 # Install RPMs
 #
