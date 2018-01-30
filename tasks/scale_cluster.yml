@@ -128,9 +128,20 @@
 - meta: flush_handlers
 
 #
-# TODO: Prepare stanzas for next run
+# Prepare stanzas for next run
 #
+- name: cluster | Find new cluster members
+  add_host:
+    name: "{{ item }}"
+    groups: scale_cluster_members
+  with_items: "{{ ansible_play_hosts }}"
+  changed_when: false
 
+- name: cluster | Prepare existing cluster ChangeFile
+  template: src=ChangeFile.j2 dest=/var/tmp/ChangeFile
+  run_once: true
+  delegate_to: "{{ groups['scale_cluster_members'].0 }}"
+  changed_when: false
 
 #
 # Start daemons on new nodes
