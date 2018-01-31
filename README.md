@@ -23,7 +23,6 @@ The following installation methods are available:
 - Install from local installation package (accessible on Ansible control machine)
 
 Future plans:
-- Configure filesystem parameters
 - Manage nodeclasses and configuration parameters
 - Perform online upgrade
 
