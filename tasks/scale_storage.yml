@@ -11,6 +11,12 @@
       changed_when: false
       failed_when: false
 
+    - name: storage | Find current filesystem parameters
+      shell: "/usr/lpp/mmfs/bin/mmlsfs all -Y | grep -v HEADER"
+      register: scale_storage_existing_fsparams
+      changed_when: false
+      failed_when: false
+
     - name: storage | Find existing NSDs
       shell: "/usr/lpp/mmfs/bin/mmlsnsd -a -Y | grep -v HEADER | cut -d ':' -f 8"
       register: scale_storage_existing_nsds
@@ -24,7 +30,7 @@
       failed_when: false
   run_once: true
 
-- name: storage | Initialize default variables
+- name: storage | Initialize undefined variables
   set_fact:
     scale_storage: []
     scale_storage_nsddefs: []
@@ -47,6 +53,11 @@
         scale_storage_nsddefs: "{{ ansible_play_hosts | map('extract', hostvars, 'scale_storage_nsddefs') | sum(start=[]) }}"
         scale_storage_nsdservers: "{% set nsdservers=ansible_play_hosts | map('extract', hostvars, 'scale_storage_nsdservers') | sum(start=[]) | join(',') %}{{ nsdservers.split(',') | unique }}"
         scale_storage_fsdefs: "{{ ansible_play_hosts | map('extract', hostvars, 'scale_storage') | sum(start=[]) | map(attribute='filesystem') | list | unique }}"
+
+    - name: storage | Consolidate defined filesystem parameters
+      set_fact:
+        scale_storage_fsparams: "{{ scale_storage_fsparams | default({}) | combine({ item.filesystem:item }, recursive=true) }}"
+      with_items: "{{ ansible_play_hosts | map('extract', hostvars, 'scale_storage') | sum(start=[]) }}"
 
 #
 # Create new NSDs
@@ -85,8 +96,14 @@
       with_items: "{{ scale_storage_fsdefs }}"
       changed_when: false
 
-    - name: storage | Create new filesystems
-      command: /usr/lpp/mmfs/bin/mmcrfs {{ item.item }} -F /var/tmp/StanzaFile.new.{{ item.item }}
+    - name: storage | Create new filesystem(s)
+      command: /usr/lpp/mmfs/bin/mmcrfs {{ item.item }} \
+        -F /var/tmp/StanzaFile.new.{{ item.item }} \
+        -B {{ scale_storage_fsparams[item.item].blockSize | default(scale_storage_filesystem_defaults.blockSize) }} \
+        -m {{ scale_storage_fsparams[item.item].defaultMetadataReplicas | default(scale_storage_filesystem_defaults.defaultMetadataReplicas) }} \
+        -r {{ scale_storage_fsparams[item.item].defaultDataReplicas | default(scale_storage_filesystem_defaults.defaultDataReplicas) }} \
+        -n {{ scale_storage_fsparams[item.item].numNodes | default(scale_storage_filesystem_defaults.numNodes) }}
+        -T {{ scale_storage_fsparams[item.item].defaultMountPoint | default(scale_storage_filesystem_defaults.defaultMountPoint_prefix + item.item) }}
       when:
         - item.item not in scale_storage_existing_fs.stdout_lines
         - item.size > 1
@@ -127,7 +144,7 @@
     - name: storage | Prepare existing NSD StanzaFile(s)
       vars:
         current_fs: "{{ item }}"
-        current_nsds: "{{ scale_storage_existing_nsds.stdout_lines }}"
+        current_nsds: "{{ scale_storage_existing_nsds.stdout_lines }}"  ## only existing NSDs
       template: src=StanzaFile.j2 dest=/var/tmp/StanzaFile.{{ current_fs }}
       register: scale_storage_stanzafile_existing
       with_items: "{{ scale_storage_fsdefs }}"
@@ -143,7 +160,7 @@
         - item.size > 1
       with_items: "{{ scale_storage_stanzafile_existing.results }}"
 
-    - name: storage | Adopt temp existing NSD StanzaFile(s)
+    - name: storage | Filter temp existing NSD StanzaFile(s)
       replace:
         path: /var/tmp/StanzaFile.{{ item.item }}.nsd
         regexp: '^\s*(usage|failureGroup|pool)=.*\n'
@@ -203,4 +220,28 @@
       template: src=StanzaFile.j2 dest=/var/tmp/StanzaFile.{{ current_fs }}
       with_items: "{{ scale_storage_fsdefs }}"
       changed_when: false
+
+#
+# Change existing filesystems
+#
+    - name: storage | Find filesystems with changed parameters
+      set_fact:
+        scale_storage_changed_fs: "{{ scale_storage_changed_fs | default([]) + [ item.key ] }}"
+      when:
+        - item.key in scale_storage_existing_fs.stdout_lines
+        - (not scale_storage_existing_fsparams.stdout | search(item.key + ':defaultMetadataReplicas:' + item.value.defaultMetadataReplicas | default(scale_storage_filesystem_defaults.defaultMetadataReplicas) | string + ':')) or
+          (not scale_storage_existing_fsparams.stdout | search(item.key + ':defaultDataReplicas:' + item.value.defaultDataReplicas | default(scale_storage_filesystem_defaults.defaultDataReplicas) | string + ':')) or
+          (not scale_storage_existing_fsparams.stdout | search(item.key + ':numNodes:' + item.value.numNodes | default(scale_storage_filesystem_defaults.numNodes) | string + ':')) or
+          (not scale_storage_existing_fsparams.stdout | search(item.key + ':defaultMountPoint:' + item.value.defaultMountPoint | default(scale_storage_filesystem_defaults.defaultMountPoint_prefix + item.key) | regex_replace('/', '%2F') + ':'))
+      with_dict: "{{ scale_storage_fsparams | default({}) }}"
+
+    - name: storage | Change filesystem parameters
+      command: /usr/lpp/mmfs/bin/mmchfs {{ item.key }} \
+        -m {{ item.value.defaultMetadataReplicas | default(scale_storage_filesystem_defaults.defaultMetadataReplicas) }} \
+        -r {{ item.value.defaultDataReplicas | default(scale_storage_filesystem_defaults.defaultDataReplicas) }} \
+        -n {{ item.value.numNodes | default(scale_storage_filesystem_defaults.numNodes) }}
+        -T {{ item.value.defaultMountPoint | default(scale_storage_filesystem_defaults.defaultMountPoint_prefix + item.key) }}
+      when:
+        - item.key in scale_storage_changed_fs | default([])
+      with_dict: "{{ scale_storage_fsparams | default({}) }}"
   run_once: true

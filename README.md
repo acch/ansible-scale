@@ -15,7 +15,7 @@ Features
 - Create new-, or extend existing cluster
 - Perform (offline) upgrade if daemon is stopped
 - Configure Network Shared Disks (NSDs)
-- Create new-, or extend existing filesystems [WIP]
+- Create new-, or extend existing filesystems
 
 The following installation methods are available:
 - Install from (existing) YUM repository
@@ -24,7 +24,8 @@ The following installation methods are available:
 
 Future plans:
 - Configure filesystem parameters
-- Manage configuration parameters
+- Manage nodeclasses and configuration parameters
+- Perform online upgrade
 
 Installation
 ------------
@@ -98,7 +99,7 @@ scale05  scale_cluster_quorum=false scale_cluster_manager=false
 
 Refer to `defaults/main.yml` for a detailed explanation of possible variables and configuration options.
 
-Defining node roles such as 'quorum' and 'manager' is optional. If you don't specify any quorum nodes then the first seven hosts in your inventory will automatically be assigned the quorum role.
+Defining node roles such as `scale_cluster_quorum` and `scale_cluster_manager` is optional. If you don't specify any quorum nodes then the first seven hosts in your inventory will automatically be assigned the quorum role.
 
 The above examples will install required packages and create a functional Spectrum Scale cluster which can be used to e.g. mount existing remote filesystems. To also create local filesystems in the new cluster you will need to provide additional information. It's suggested to use `host_vars` inventory files for that purpose:
 
@@ -107,6 +108,11 @@ The above examples will install required packages and create a functional Spectr
 ---
 scale_storage:
   - filesystem: gpfs01
+    blockSize: 1M
+    defaultMetadataReplicas: 2
+    defaultDataReplicas: 2
+    numNodes: 16
+    defaultMountPoint: /mnt/gpfs01
     disks:
       - device: /dev/sdb
         nsd: nsd_1
@@ -141,7 +147,7 @@ scale_storage:
         pool: data
 ```
 
-The 'device' variable is mandatory for each filesystem disk. All other disk parameters are optional. Thus, a minimal filesystem configuration would look like this:
+The `filesystem` name is mandatory, and the `device` variable is mandatory for each of the filesystem's disks. All other filesystem and disk parameters are optional. Thus, a minimal filesystem configuration would look like this:
 
 ```
 # host_vars/scale01:
@@ -165,7 +171,7 @@ scale_storage:
 Limitations
 -----------
 
-This role can (currently) be used to create new-, or extend existing clusters. Similarly, new filesystems can be created or extended. But this role will not remove existing nodes, disks or filesystems &mdash; on purpose. This is also the reason why it can not be used to e.g. change the filesystem pool of a disk. Changing the pool requires one to remove and then re-add the disk from a filesystem, which is not currently in scope of this role.
+This role can (currently) be used to create new-, or extend existing clusters. Similarly, new filesystems can be created or extended. But this role will not remove existing nodes, disks or filesystems &mdash; on purpose! This is also the reason why it can not be used to e.g. change the filesystem pool of a disk. Changing the pool requires one to remove and then re-add the disk from a filesystem, which is not currently in scope of this role.
 
 Copyright and license
 ---------------------

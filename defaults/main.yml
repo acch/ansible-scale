@@ -56,3 +56,11 @@ scale_cluster_quorum: false
 
 ## Node's default manager role - you'll likely want to define per-node roles in your inventory
 scale_cluster_manager: false
+
+## Default filesystem parameters
+scale_storage_filesystem_defaults:
+  blockSize: 1M
+  defaultMetadataReplicas: 1
+  defaultDataReplicas: 1
+  numNodes: 32
+  defaultMountPoint_prefix: /mnt/
