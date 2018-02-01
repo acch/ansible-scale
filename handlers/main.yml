@@ -18,7 +18,7 @@
   failed_when: false
 
 - name: wait-daemon-active
-  shell: "/usr/lpp/mmfs/bin/mmgetstate -Y -N localhost | grep -v HEADER | cut -d ':' -f 9"
+  shell: "/usr/lpp/mmfs/bin/mmgetstate -N localhost -Y | grep -v HEADER | cut -d ':' -f 9"
   register: state
   until: state.stdout == "active"
   retries: 10
