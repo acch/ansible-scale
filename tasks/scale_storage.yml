@@ -1,5 +1,5 @@
 ---
-# Define Network Shared Disks (NSDs)
+# Define Network Shared Disks (NSDs) and filesystems
 
 #
 # Inspect existing, free, and defined NSDs
@@ -229,10 +229,10 @@
         scale_storage_changed_fs: "{{ scale_storage_changed_fs | default([]) + [ item.key ] }}"
       when:
         - item.key in scale_storage_existing_fs.stdout_lines
-        - (not scale_storage_existing_fsparams.stdout | search(item.key + ':defaultMetadataReplicas:' + item.value.defaultMetadataReplicas | default(scale_storage_filesystem_defaults.defaultMetadataReplicas) | string + ':')) or
-          (not scale_storage_existing_fsparams.stdout | search(item.key + ':defaultDataReplicas:' + item.value.defaultDataReplicas | default(scale_storage_filesystem_defaults.defaultDataReplicas) | string + ':')) or
-          (not scale_storage_existing_fsparams.stdout | search(item.key + ':numNodes:' + item.value.numNodes | default(scale_storage_filesystem_defaults.numNodes) | string + ':')) or
-          (not scale_storage_existing_fsparams.stdout | search(item.key + ':defaultMountPoint:' + item.value.defaultMountPoint | default(scale_storage_filesystem_defaults.defaultMountPoint_prefix + item.key) | regex_replace('/', '%2F') + ':'))
+        - (not scale_storage_existing_fsparams.stdout | search(':' + item.key + ':defaultMetadataReplicas:' + item.value.defaultMetadataReplicas | default(scale_storage_filesystem_defaults.defaultMetadataReplicas) | string + ':')) or
+          (not scale_storage_existing_fsparams.stdout | search(':' + item.key + ':defaultDataReplicas:' + item.value.defaultDataReplicas | default(scale_storage_filesystem_defaults.defaultDataReplicas) | string + ':')) or
+          (not scale_storage_existing_fsparams.stdout | search(':' + item.key + ':numNodes:' + item.value.numNodes | default(scale_storage_filesystem_defaults.numNodes) | string + ':')) or
+          (not scale_storage_existing_fsparams.stdout | search(':' + item.key + ':defaultMountPoint:' + item.value.defaultMountPoint | default(scale_storage_filesystem_defaults.defaultMountPoint_prefix + item.key) | regex_replace('/', '%2F') + ':'))
       with_dict: "{{ scale_storage_fsparams | default({}) }}"
 
     - name: storage | Change filesystem parameters
