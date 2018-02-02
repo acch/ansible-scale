@@ -15,7 +15,8 @@ Features
 - Create new-, or extend existing cluster
 - Perform (offline) upgrade if daemon is stopped
 - Configure Network Shared Disks (NSDs)
-- Create new-, or extend existing filesystems
+- Create new-, or extend existing file systems
+- Configure node classes
 
 The following installation methods are available:
 - Install from (existing) YUM repository
@@ -23,7 +24,7 @@ The following installation methods are available:
 - Install from local installation package (accessible on Ansible control machine)
 
 Future plans:
-- Manage nodeclasses and configuration parameters
+- Define configuration parameters
 - Perform online upgrade
 
 Installation
@@ -100,7 +101,7 @@ Refer to `defaults/main.yml` for a detailed explanation of possible variables an
 
 Defining node roles such as `scale_cluster_quorum` and `scale_cluster_manager` is optional. If you don't specify any quorum nodes then the first seven hosts in your inventory will automatically be assigned the quorum role.
 
-The above examples will install required packages and create a functional Spectrum Scale cluster which can be used to e.g. mount existing remote filesystems. To also create local filesystems in the new cluster you will need to provide additional information. It's suggested to use `host_vars` inventory files for that purpose:
+The above examples will install required packages and create a functional Spectrum Scale cluster which can be used to e.g. mount existing remote file systems. To also create local file systems in the new cluster you will need to provide additional information. It's suggested to use `host_vars` inventory files for that purpose:
 
 ```
 # host_vars/scale01:
@@ -146,7 +147,7 @@ scale_storage:
         pool: data
 ```
 
-The `filesystem` name is mandatory, and the `device` variable is mandatory for each of the filesystem's disks. All other filesystem and disk parameters are optional. Thus, a minimal filesystem configuration would look like this:
+The `filesystem` name is mandatory, and the `device` variable is mandatory for each of the file system's `disks`. All other file system and disk parameters are optional. Hence, a minimal file system configuration would look like this:
 
 ```
 # host_vars/scale01:
@@ -167,10 +168,32 @@ scale_storage:
       - device: /dev/sdc
 ```
 
+Furthermore, node classes can be defined on a per-node basis:
+
+```
+# host_vars/scale01:
+---
+scale_nodeclass:
+  - classA
+  - classB
+```
+```
+# host_vars/scale02:
+---
+scale_nodeclass:
+  - classA
+  - classC
+```
+
 Limitations
 -----------
 
-This role can (currently) be used to create new-, or extend existing clusters. Similarly, new filesystems can be created or extended. But this role will not remove existing nodes, disks or filesystems &mdash; on purpose! This is also the reason why it can not be used to e.g. change the filesystem pool of a disk. Changing the pool requires one to remove and then re-add the disk from a filesystem, which is not currently in scope of this role.
+This role can (currently) be used to create new-, or extend existing clusters. Similarly, new file systems can be created or extended. But this role will *not* remove existing nodes, disks, file systems or node classes &mdash; on purpose! This is also the reason why it can not be used to e.g. change the file system pool of a disk. Changing the pool requires one to remove and then re-add the disk from a file system, which is not currently in scope of this role.
+
+Troubleshooting
+---------------
+
+This role stores configuration files in `/var/tmp` on the first host in the play. These configuration files are kept to determine if definitions have changed since the previous run, and to decide if it's necessary to run certain Spectrum Scale commands (again). When experiencing problems one can simply delete these configuration files from `/var/tmp` in order to clear the cache &mdash; this will force re-application of all definitions upon the next run. As a downside the next run may take longer than expected as it may re-run unnecessary Spectrum Scale commands. This will automatically re-generate the cache files.
 
 Copyright and license
 ---------------------
