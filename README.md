@@ -17,6 +17,7 @@ Features
 - Configure Network Shared Disks (NSDs)
 - Create new-, or extend existing file systems
 - Configure node classes
+- Define configuration parameters based on node classes
 
 The following installation methods are available:
 - Install from (existing) YUM repository
@@ -24,7 +25,6 @@ The following installation methods are available:
 - Install from local installation package (accessible on Ansible control machine)
 
 Future plans:
-- Define configuration parameters
 - Perform online upgrade
 
 Installation
@@ -101,7 +101,7 @@ Refer to `defaults/main.yml` for a detailed explanation of possible variables an
 
 Defining node roles such as `scale_cluster_quorum` and `scale_cluster_manager` is optional. If you don't specify any quorum nodes then the first seven hosts in your inventory will automatically be assigned the quorum role.
 
-The above examples will install required packages and create a functional Spectrum Scale cluster which can be used to e.g. mount existing remote file systems. To also create local file systems in the new cluster you will need to provide additional information. It's suggested to use `host_vars` inventory files for that purpose:
+The above examples will install required packages and create a functional Spectrum Scale cluster which can be used to e.g. mount existing remote file systems. To also create local file systems in the new cluster you'll need to provide additional information. It's suggested to use `host_vars` inventory files for that purpose:
 
 ```
 # host_vars/scale01:
@@ -185,6 +185,19 @@ scale_nodeclass:
   - classC
 ```
 
+These node classes can optionally be used to define configuration parameters:
+
+```
+# host_vars/scale01:
+---
+scale_config:
+  - nodeclass: classA
+    params:
+      - pagepool: 4G
+      - autoload: no
+      - ignorePrefetchLUNCount: yes
+```
+
 Limitations
 -----------
 
@@ -193,7 +206,9 @@ This role can (currently) be used to create new-, or extend existing clusters. S
 Troubleshooting
 ---------------
 
-This role stores configuration files in `/var/tmp` on the first host in the play. These configuration files are kept to determine if definitions have changed since the previous run, and to decide if it's necessary to run certain Spectrum Scale commands (again). When experiencing problems one can simply delete these configuration files from `/var/tmp` in order to clear the cache &mdash; this will force re-application of all definitions upon the next run. As a downside the next run may take longer than expected as it may re-run unnecessary Spectrum Scale commands. This will automatically re-generate the cache files.
+This role stores configuration files in `/var/tmp` on the first host in the play. These configuration files are kept to determine if definitions have changed since the previous run, and to decide if it's necessary to run certain Spectrum Scale commands (again). When experiencing problems one can simply delete these configuration files from `/var/tmp` in order to clear the cache &mdash; this will force re-application of all definitions upon the next run. As a downside, the next run may take longer than expected as it will re-run unnecessary Spectrum Scale commands. This will automatically re-generate the cache files.
+
+Please use the [issue tracker](https://github.com/acch/ansible-scale/issues) to ask questions, report bugs and request features.
 
 Copyright and license
 ---------------------

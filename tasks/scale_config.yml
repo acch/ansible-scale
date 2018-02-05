@@ -2,7 +2,7 @@
 # Define nodeclasses and configuration parameters
 
 #
-# Inspect existing nodeclasses and inventory
+# Inspect existing nodeclasses, config params and inventory
 #
 - name: config | Group hosts by defined nodeclasses
   group_by:
@@ -10,10 +10,21 @@
   when: scale_nodeclass is defined
   with_items: "{{ scale_nodeclass }}"
 
+- name: config | Initialize undefined variables
+  set_fact:
+    scale_config: []
+  when: scale_config is undefined
+
 - block:  ## run_once: true
     - name: config | Find existing nodeclasses
       shell: "/usr/lpp/mmfs/bin/mmlsnodeclass --user -Y | grep -v HEADER | cut -d ':' -f 7"
       register: scale_config_existing_nodeclasses
+      changed_when: false
+      failed_when: false
+
+    - name: config | Find existing configuration parameters
+      shell: "/usr/lpp/mmfs/bin/mmlsconfig -Y | grep -v HEADER"
+      register: scale_config_existing_params
       changed_when: false
       failed_when: false
 
@@ -54,4 +65,20 @@
         - item | changed
         - item.size > 1
       with_items: "{{ scale_config_nodeclassfile.results }}"
+
+#
+# Apply config params
+#
+    - name: config | Apply defined configuration parameters
+      vars:
+        current_key: "{{ item.1.keys().0 }}"
+        current_value: "{{ item.1[current_key] | string | regex_replace('True', 'yes') | regex_replace('False', 'no') }}"
+        current_nodeclass: "{{ item.0.nodeclass }}"
+      command: /usr/lpp/mmfs/bin/mmchconfig {{ current_key }}={{ current_value }} -N {{ current_nodeclass }}
+      when:
+        - not scale_config_existing_params.stdout | search(':' + current_key + ':' + current_value + ':' + current_nodeclass | regex_replace('all', '') + ':')
+      with_subelements:
+        - "{{ ansible_play_hosts | map('extract', hostvars, 'scale_config') | sum(start=[]) }}"
+        - params
+
   run_once: true
