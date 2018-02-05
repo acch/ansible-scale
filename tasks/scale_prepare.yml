@@ -47,14 +47,11 @@
 #
 - name: prepare | Read public SSH key
   slurp: src={{ scale_prepare_pubkey_path }}
-  register: scale_prepare_pubkey_b64
-
-- name: prepare | Decode public SSH key
-  set_fact: scale_prepare_pubkey={{ scale_prepare_pubkey_b64.content | b64decode }}
+  register: scale_prepare_pubkey
 
 - name: prepare | Authorize all SSH keys
   authorized_key:
     user: root
-    key: "{{ hostvars[item].scale_prepare_pubkey }}"
+    key: "{{ hostvars[item].scale_prepare_pubkey.content | b64decode }}"
     state: present
   with_items: "{{ ansible_play_hosts }}"

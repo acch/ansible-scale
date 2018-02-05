@@ -213,10 +213,11 @@
 #
 # Prepare stanzas for next run
 #
+    # TODO: only re-generate StanzaFile if new NSDs were created
     - name: storage | Prepare existing NSD StanzaFile(s) for next run
       vars:
         current_fs: "{{ item }}"
-        current_nsds: "{{ scale_storage_nsddefs }}"
+        current_nsds: "{{ scale_storage_nsddefs }}"  ## all defined NSDs
       template: src=StanzaFile.j2 dest=/var/tmp/StanzaFile.{{ current_fs }}
       with_items: "{{ scale_storage_fsdefs }}"
       changed_when: false

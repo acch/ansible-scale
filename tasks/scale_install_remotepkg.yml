@@ -20,14 +20,13 @@
 - block:  ## when: scale_install_md5_file.stat.exists
     - name: install | Read checksum from file
       slurp: src={{ scale_install_remotepkg_path }}.md5
-      register: scale_install_md5_sum_b64
-
-    - name: install | Decode checksum
-      set_fact: scale_install_md5_sum={{ scale_install_md5_sum_b64.content | b64decode }}
+      register: scale_install_md5_sum
 
     - name: install | Compare checksums
+      vars:
+        md5sum: "{{ scale_install_md5_sum.content | b64decode }}"
       assert:
-        that: scale_install_md5_sum.strip().split().0 == scale_install_remotepkg.stat.md5
+        that: md5sum.strip().split().0 == scale_install_remotepkg.stat.md5
         msg: "Checksums don't match. Please check integritiy of your remote installation package!"
   when: scale_install_md5_file.stat.exists
 
