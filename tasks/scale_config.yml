@@ -76,7 +76,7 @@
         current_nodeclass: "{{ item.0.nodeclass }}"
       command: /usr/lpp/mmfs/bin/mmchconfig {{ current_key }}={{ current_value }} -N {{ current_nodeclass }}
       when:
-        - not scale_config_existing_params.stdout | search(':' + current_key + ':' + current_value + ':' + current_nodeclass | regex_replace('all', '') + ':')
+        - not scale_config_existing_params.stdout | lower | search(':' + current_key | lower + ':' + current_value | lower + ':' + current_nodeclass | regex_replace('all', '') + ':')
       with_subelements:
         - "{{ ansible_play_hosts | map('extract', hostvars, 'scale_config') | sum(start=[]) }}"
         - params
