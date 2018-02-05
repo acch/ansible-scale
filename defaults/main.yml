@@ -58,6 +58,7 @@ scale_cluster_quorum: false
 scale_cluster_manager: false
 
 ## Default filesystem parameters
+## Show all possible settings with '$mmlsfs all -Y'
 scale_storage_filesystem_defaults:
   blockSize: 1M
   defaultMetadataReplicas: 1
