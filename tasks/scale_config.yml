@@ -75,10 +75,14 @@
         current_value: "{{ item.1[current_key] | string | regex_replace('True', 'yes') | regex_replace('False', 'no') }}"
         current_nodeclass: "{{ item.0.nodeclass }}"
       command: /usr/lpp/mmfs/bin/mmchconfig {{ current_key }}={{ current_value }} -N {{ current_nodeclass }}
+      register: scale_config_changed_params
       when:
-        - not scale_config_existing_params.stdout | lower | search(':' + current_key | lower + ':' + current_value | lower + ':' + current_nodeclass | regex_replace('all', '') + ':')
+        - not scale_config_existing_params.stdout | lower | search(':' + current_key | lower + ':' + current_value | lower + ':(.+,)?' + current_nodeclass | lower | regex_replace('all', '') + '(,.+)?:')
       with_subelements:
         - "{{ ansible_play_hosts | map('extract', hostvars, 'scale_config') | sum(start=[]) }}"
         - params
 
+    - name: config | Find changed configuration parameters
+      debug: msg="Configuration parameters were changed. Please restart Spectrum Scale for the new settings to take effect!"
+      when: true in scale_config_changed_params.results | map(attribute='changed') | list
   run_once: true
