@@ -198,6 +198,8 @@ scale_config:
       - ignorePrefetchLUNCount: yes
 ```
 
+Refer to `man mmchconfig` for a list of available configuration parameters.
+
 Limitations
 -----------
 
