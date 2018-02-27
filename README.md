@@ -3,7 +3,7 @@ IBM Spectrum Scale (GPFS) Ansible Role
 
 Highly-customizable Ansible role for installing and configuring IBM Spectrum Scale (GPFS)
 
-This project is in early development... looking for [feedback](https://github.com/acch/ansible-scale/issues) and future [requirements](https://github.com/acch/ansible-scale/issues/new)!
+Particularly looking for [feedback](https://github.com/acch/ansible-scale/issues) and future [requirements](https://github.com/acch/ansible-scale/issues/new)!
 
 Features
 --------
@@ -147,6 +147,8 @@ scale_storage:
         pool: data
 ```
 
+Refer to `man mmchfs` and `man mmchnsd` for a description of the above storage parameters.
+
 The `filesystem` name is mandatory, and the `device` variable is mandatory for each of the file system's `disks`. All other file system and disk parameters are optional. Hence, a minimal file system configuration would look like this:
 
 ```
@@ -168,7 +170,9 @@ scale_storage:
       - device: /dev/sdc
 ```
 
-Furthermore, node classes can be defined on a per-node basis:
+Note that filesystem parameters can be defined as variables for *any* host in the play &mdash; the host for which you define the filesystem parameters is irrelevant. For disk parameters the host is only relevant if you omit the `servers` variable. When omitting the `servers` variable then the host for which you define the disk is automatically considered the (only) NSD server for that particular disk.
+
+Furthermore, node classes can be defined on a per-node basis by defining the `scale_nodeclass` variable:
 
 ```
 # host_vars/scale01:
@@ -185,7 +189,7 @@ scale_nodeclass:
   - classC
 ```
 
-These node classes can optionally be used to define configuration parameters:
+These node classes can optionally be used to define Spectrum Scale configuration parameters:
 
 ```
 # host_vars/scale01:
@@ -200,6 +204,8 @@ scale_config:
 
 Refer to `man mmchconfig` for a list of available configuration parameters.
 
+Note that configuration parameters can be defined as variables for *any* host in the play &mdash; the host for which you define the configuration parameters is irrelevant.
+
 Limitations
 -----------
 
@@ -208,7 +214,7 @@ This role can (currently) be used to create new-, or extend existing clusters. S
 Troubleshooting
 ---------------
 
-This role stores configuration files in `/var/tmp` on the first host in the play. These configuration files are kept to determine if definitions have changed since the previous run, and to decide if it's necessary to run certain Spectrum Scale commands (again). When experiencing problems one can simply delete these configuration files from `/var/tmp` in order to clear the cache &mdash; this will force re-application of all definitions upon the next run. As a downside, the next run may take longer than expected as it will re-run unnecessary Spectrum Scale commands. This will automatically re-generate the cache files.
+This role stores configuration files in `/var/tmp` on the first host in the play. These configuration files are kept to determine if definitions have changed since the previous run, and to decide if it's necessary to run certain Spectrum Scale commands (again). When experiencing problems one can simply delete these configuration files from `/var/tmp` in order to clear the cache &mdash; this will force re-application of all definitions upon the next run. As a downside, the next run may take longer than expected as it will re-run unnecessary Spectrum Scale commands. This will automatically re-generate the cache.
 
 Please use the [issue tracker](https://github.com/acch/ansible-scale/issues) to ask questions, report bugs and request features.
 
