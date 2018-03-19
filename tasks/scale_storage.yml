@@ -76,6 +76,7 @@
       when:
         - scale_storage_stanzafile_new.results | sum(attribute='size') > scale_storage_stanzafile_new.results | length
 
+    # TODO: make '-v yes|no' configurable as scale_storage_verify
     - name: storage | Create new NSDs
       command: /usr/lpp/mmfs/bin/mmcrnsd -F /var/tmp/StanzaFile.new.{{ item.item }}
       when:
@@ -104,6 +105,7 @@
         -r {{ scale_storage_fsparams[item.item].defaultDataReplicas | default(scale_storage_filesystem_defaults.defaultDataReplicas) }} \
         -n {{ scale_storage_fsparams[item.item].numNodes | default(scale_storage_filesystem_defaults.numNodes) }}
         -T {{ scale_storage_fsparams[item.item].defaultMountPoint | default(scale_storage_filesystem_defaults.defaultMountPoint_prefix + item.item) }}
+        # TODO: -A automaticMount yes|no
       when:
         - item.item not in scale_storage_existing_fs.stdout_lines
         - item.size > 1

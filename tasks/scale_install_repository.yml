@@ -26,7 +26,8 @@
   debug: msg="Spectrum Scale is running. Please stop it for an upgrade!"
   when: scale_install_daemonprocs.rc == 0
 
-# TODO: If GPFS already installed check version and compare with scale_version
+# TODO: if GPFS already installed then check `mmdiag --version` and compare with scale_version
+# TODO: -> scale_update.yml
 
 #
 # Install RPMs
@@ -44,7 +45,7 @@
   when: scale_install_daemonprocs.rc == 1
 
 
-# TODO: online upgrade
+# TODO: online upgrade as separate playbook
 # ... serial ...
 # - block:
 #     - stop GPFS on node

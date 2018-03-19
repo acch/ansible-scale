@@ -25,6 +25,8 @@ The following installation methods are available:
 - Install from local installation package (accessible on Ansible control machine)
 
 Future plans:
+- Configure tiebreaker disk
+- Install GUI and zimon packages
 - Perform online upgrade
 
 Installation
