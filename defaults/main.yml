@@ -63,7 +63,7 @@ scale_storage_filesystem_defaults:
   defaultMetadataReplicas: 1
   defaultDataReplicas: 1
   numNodes: 32
-  automaticMountOption: false  ## TODO, also manually mount after creation if true
+  automaticMountOption: false
   ## defaultMountPoint will be this prefix, followed by the filesystem name
   defaultMountPoint_prefix: /mnt/
   ## Overwrite existing NSDs - if set to 'true' then disks will *not* be checked for an existing NSD header (dangerous!)
