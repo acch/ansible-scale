@@ -51,16 +51,20 @@ scale_build_prereqs:
 scale_cluster_clustername: gpfs1.local
 
 ## Node's default quorum role - you'll likely want to define per-node roles in your inventory
-## Note that if you don't specify any quorum nodes then the first seven hosts in your inventory will automatically be assigned the quorum role, even if this variable is 'false'
+## If you don't specify any quorum nodes then the first seven hosts in your inventory will automatically be assigned the quorum role, even if this variable is 'false'
 scale_cluster_quorum: false
 
 ## Node's default manager role - you'll likely want to define per-node roles in your inventory
 scale_cluster_manager: false
 
-## Default filesystem parameters
+## Default filesystem parameters - can be overridden for each filesystem individually
 scale_storage_filesystem_defaults:
   blockSize: 1M
   defaultMetadataReplicas: 1
   defaultDataReplicas: 1
   numNodes: 32
+  automaticMountOption: false  ## TODO, also manually mount after creation if true
+  ## defaultMountPoint will be this prefix, followed by the filesystem name
   defaultMountPoint_prefix: /mnt/
+  ## Overwrite existing NSDs - if set to 'true' then disks will *not* be checked for an existing NSD header (dangerous!)
+  overwriteNSDs: false
