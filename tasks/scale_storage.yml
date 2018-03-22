@@ -11,6 +11,12 @@
       changed_when: false
       failed_when: false
 
+    - name: storage | Find current filesystem mounts
+      shell: "/usr/lpp/mmfs/bin/mmlsmount all -Y | grep -v HEADER"
+      register: scale_storage_existing_fsmounts
+      changed_when: false
+      failed_when: false
+
     - name: storage | Find current filesystem parameters
       shell: "/usr/lpp/mmfs/bin/mmlsfs all -Y | grep -v HEADER"
       register: scale_storage_existing_fsparams
@@ -258,11 +264,11 @@
         - item.key in scale_storage_changed_fs | default([])
       with_dict: "{{ scale_storage_fsparams | default({}) }}"
 
-#    - name: storage | TODO: Change offline filesystem parameters
-#      command: /usr/lpp/mmfs/bin/mmchfs {{ item.key }} \
-#        -T {{ item.value.defaultMountPoint | default(scale_storage_filesystem_defaults.defaultMountPoint_prefix + item.key) }}
-#      when:
-#        - item.key in scale_storage_changed_fs | default([])
-#        # TODO: filesystem is not mounted -> mmlsmount gpfs01 -Y
-#      with_dict: "{{ scale_storage_fsparams | default({}) }}"
+    - name: storage | Change offline filesystem parameters
+      command: /usr/lpp/mmfs/bin/mmchfs {{ item.key }} \
+        -T {{ item.value.defaultMountPoint | default(scale_storage_filesystem_defaults.defaultMountPoint_prefix + item.key) }}
+      when:
+        - item.key in scale_storage_changed_fs | default([])
+        - scale_storage_existing_fsmounts.stdout | search(':' + item.key + ':' + item.key + ':' + scale_cluster_clustername + ':0:')
+      with_dict: "{{ scale_storage_fsparams | default({}) }}"
   run_once: true
