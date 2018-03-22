@@ -112,7 +112,13 @@
         - item.size > 1
       with_items: "{{ scale_storage_stanzafile_new.results }}"
 
-      # TODO: mount FS if automaticMountOption == true
+    - name: storage | Mount new filesystem(s)
+      command: /usr/lpp/mmfs/bin/mmmount {{ item.item }} -a
+      when:
+        - item.item not in scale_storage_existing_fs.stdout_lines
+        - item.size > 1
+        - scale_storage_fsparams[item.item].automaticMountOption | default(scale_storage_filesystem_defaults.automaticMountOption)
+      with_items: "{{ scale_storage_stanzafile_new.results }}"
 
 #
 # Add disks to existing filesystems
