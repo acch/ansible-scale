@@ -114,6 +114,7 @@ scale_storage:
     defaultMetadataReplicas: 2
     defaultDataReplicas: 2
     numNodes: 16
+    automaticMountOption: true
     defaultMountPoint: /mnt/gpfs01
     disks:
       - device: /dev/sdb
