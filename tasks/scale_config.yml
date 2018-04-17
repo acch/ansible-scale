@@ -82,8 +82,10 @@
         - "{{ ansible_play_hosts | map('extract', hostvars, 'scale_config') | sum(start=[]) }}"
         - params
 
-    # TODO: only print this message if daemon is already running
-    #- name: config | Find changed configuration parameters
-    #  debug: msg="Configuration parameters were changed. Please restart Spectrum Scale for the new settings to take effect!"
-    #  when: true in scale_config_changed_params.results | map(attribute='changed') | list
+    # TODO: print this message at the end of the play (set_fact)
+    - name: config | Find changed configuration parameters
+      debug: msg="Configuration parameters were changed. Please restart Spectrum Scale for the new settings to take effect!"
+      when:
+        - true in scale_config_changed_params.results | map(attribute='changed') | list
+        - scale_daemon_running == true
   run_once: true
