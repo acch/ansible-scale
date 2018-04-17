@@ -16,15 +16,9 @@
 #
 # Ensure no daemon running
 #
-- name: install | Count daemon processes
-  command: pgrep mmfsd
-  register: scale_install_daemonprocs
-  changed_when: false
-  failed_when: false
-
-- name: install | Check daemon processes
+- name: install | Check daemon running
   debug: msg="Spectrum Scale is running. Please stop it for an upgrade!"
-  when: scale_install_daemonprocs.rc == 0
+  when: scale_daemon_running == true
 
 # TODO: if GPFS already installed then check `mmdiag --version` and compare with scale_version
 # TODO: -> scale_update.yml
@@ -32,7 +26,7 @@
 #
 # Install RPMs
 #
-- block:  ## when: scale_install_daemonprocs.rc == 1
+- block:  ## when: scale_daemon_running == false
     - name: install | Install GPFS RPMs
       yum:
         name: "{{ item }}"
@@ -42,7 +36,7 @@
       with_items:
         - "{{ scale_install_gpfs_rpms }}"
         - gpfs.gskit
-  when: scale_install_daemonprocs.rc == 1
+  when: scale_daemon_running == false
 
 
 # TODO: online upgrade as separate playbook

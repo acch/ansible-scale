@@ -13,6 +13,15 @@
     that: ansible_pkg_mgr in scale_pkg_mgr
     msg: "This system uses an unsupported package manager ({{ ansible_pkg_mgr }})!"
 
+- name: check | Count daemon processes
+  command: pgrep mmfsd
+  register: scale_daemon_procs
+  changed_when: false
+  failed_when: false
+
+- name: check | Check daemon running
+  set_fact: scale_daemon_running={{ true if scale_daemon_procs.rc == 0 else false }}
+
 # Make default variables available in hostvars
 - name: check | Set default daemon nodename
   set_fact: scale_daemon_nodename={{ scale_daemon_nodename }}
