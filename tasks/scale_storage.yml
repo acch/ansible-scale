@@ -173,7 +173,7 @@
         remote_src: yes
       when:
         - item.item in scale_storage_existing_fs.stdout_lines
-        - item | changed
+        - item is changed
         - item.size > 1
       with_items: "{{ scale_storage_stanzafile_existing.results }}"
 
@@ -183,7 +183,7 @@
         regexp: '^\s*(usage|failureGroup|pool)=.*\n'
       when:
         - item.item in scale_storage_existing_fs.stdout_lines
-        - item | changed
+        - item is changed
         - item.size > 1
       with_items: "{{ scale_storage_stanzafile_existing.results }}"
 
@@ -198,7 +198,7 @@
       notify: accept-licenses
       when:
         - item.item in scale_storage_existing_fs.stdout_lines
-        - item | changed
+        - item is changed
         - item.size > 1
       with_items: "{{ scale_storage_stanzafile_existing.results }}"
 
@@ -211,7 +211,7 @@
       file: path=/var/tmp/StanzaFile.{{ item.item }}.nsd state=absent
       when:
         - item.item in scale_storage_existing_fs.stdout_lines
-        - item | changed
+        - item is changed
         - item.size > 1
       with_items: "{{ scale_storage_stanzafile_existing.results }}"
       changed_when: false
@@ -223,7 +223,7 @@
       command: /usr/lpp/mmfs/bin/mmchdisk {{ item.item }} change -F /var/tmp/StanzaFile.{{ item.item }}
       when:
         - item.item in scale_storage_existing_fs.stdout_lines
-        - item | changed
+        - item is changed
         - item.size > 1
       with_items: "{{ scale_storage_stanzafile_existing.results }}"
 
@@ -247,11 +247,11 @@
         scale_storage_changed_fs: "{{ scale_storage_changed_fs | default([]) + [ item.key ] }}"
       when:
         - item.key in scale_storage_existing_fs.stdout_lines
-        - (not scale_storage_existing_fsparams.stdout | search(':' + item.key + ':defaultMetadataReplicas:' + item.value.defaultMetadataReplicas | default(scale_storage_filesystem_defaults.defaultMetadataReplicas) | string + ':')) or
-          (not scale_storage_existing_fsparams.stdout | search(':' + item.key + ':defaultDataReplicas:' + item.value.defaultDataReplicas | default(scale_storage_filesystem_defaults.defaultDataReplicas) | string + ':')) or
-          (not scale_storage_existing_fsparams.stdout | search(':' + item.key + ':numNodes:' + item.value.numNodes | default(scale_storage_filesystem_defaults.numNodes) | string + ':')) or
-          (not scale_storage_existing_fsparams.stdout | search(':' + item.key + ':automaticMountOption:' + 'yes' if item.value.automaticMountOption | default(scale_storage_filesystem_defaults.automaticMountOption) else 'no' + ':')) or
-          (not scale_storage_existing_fsparams.stdout | search(':' + item.key + ':defaultMountPoint:' + item.value.defaultMountPoint | default(scale_storage_filesystem_defaults.defaultMountPoint_prefix + item.key) | regex_replace('/', '%2F') + ':'))
+        - (not scale_storage_existing_fsparams.stdout is search(':' + item.key + ':defaultMetadataReplicas:' + item.value.defaultMetadataReplicas | default(scale_storage_filesystem_defaults.defaultMetadataReplicas) | string + ':')) or
+          (not scale_storage_existing_fsparams.stdout is search(':' + item.key + ':defaultDataReplicas:' + item.value.defaultDataReplicas | default(scale_storage_filesystem_defaults.defaultDataReplicas) | string + ':')) or
+          (not scale_storage_existing_fsparams.stdout is search(':' + item.key + ':numNodes:' + item.value.numNodes | default(scale_storage_filesystem_defaults.numNodes) | string + ':')) or
+          (not scale_storage_existing_fsparams.stdout is search(':' + item.key + ':automaticMountOption:' + 'yes' if item.value.automaticMountOption | default(scale_storage_filesystem_defaults.automaticMountOption) else 'no' + ':')) or
+          (not scale_storage_existing_fsparams.stdout is search(':' + item.key + ':defaultMountPoint:' + item.value.defaultMountPoint | default(scale_storage_filesystem_defaults.defaultMountPoint_prefix + item.key) | regex_replace('/', '%2F') + ':'))
       with_dict: "{{ scale_storage_fsparams | default({}) }}"
 
     - name: storage | Change online filesystem parameters
@@ -269,6 +269,6 @@
         -T {{ item.value.defaultMountPoint | default(scale_storage_filesystem_defaults.defaultMountPoint_prefix + item.key) }}
       when:
         - item.key in scale_storage_changed_fs | default([])
-        - scale_storage_existing_fsmounts.stdout | search(':' + item.key + ':' + item.key + ':' + scale_cluster_clustername + ':0:')
+        - scale_storage_existing_fsmounts.stdout is search(':' + item.key + ':' + item.key + ':' + scale_cluster_clustername + ':0:')
       with_dict: "{{ scale_storage_fsparams | default({}) }}"
   run_once: true
