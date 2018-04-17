@@ -143,13 +143,3 @@
   run_once: true
   delegate_to: "{{ groups['scale_cluster_members'].0 }}"
   changed_when: false
-
-#
-# Start daemons on new nodes
-#
-- name: cluster | Start daemons
-  command: /usr/lpp/mmfs/bin/mmstartup -N localhost
-  when: "'scale_cluster_candidates' in group_names"
-  notify: wait-daemon-active
-
-- meta: flush_handlers

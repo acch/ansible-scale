@@ -16,8 +16,11 @@
 - import_tasks: scale_cluster.yml
   tags: cluster
 
-- import_tasks: scale_storage.yml
-  tags: storage
-
 - import_tasks: scale_config.yml
   tags: config
+
+- import_tasks: scale_cluster_start.yml
+  tags: cluster
+
+- import_tasks: scale_storage.yml
+  tags: storage
