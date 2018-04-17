@@ -49,7 +49,7 @@
       command: /usr/lpp/mmfs/bin/mmcrnodeclass {{ current_nodeclass }} -N /var/tmp/NodeClass.{{ current_nodeclass }}
       when:
         - not current_nodeclass in scale_config_existing_nodeclasses.stdout_lines
-        - item | changed
+        - item is changed
         - item.size > 1
       with_items: "{{ scale_config_nodeclassfile.results }}"
 
@@ -62,7 +62,7 @@
       command: /usr/lpp/mmfs/bin/mmchnodeclass {{ current_nodeclass }} replace -N /var/tmp/NodeClass.{{ current_nodeclass }}
       when:
         - current_nodeclass in scale_config_existing_nodeclasses.stdout_lines
-        - item | changed
+        - item is changed
         - item.size > 1
       with_items: "{{ scale_config_nodeclassfile.results }}"
 
