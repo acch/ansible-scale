@@ -14,14 +14,10 @@
   when: ansible_pkg_mgr == 'yum'
 
 #
-# Ensure no daemon running
+# Inform user about update
 #
-- name: install | Check daemon running
-  debug: msg="Spectrum Scale is running. Please stop it for an upgrade!"
+- include_tasks: scale_update.yml
   when: scale_daemon_running == true
-
-# TODO: if GPFS already installed then check `mmdiag --version` and compare with scale_version
-# TODO: -> scale_update.yml
 
 #
 # Install RPMs
