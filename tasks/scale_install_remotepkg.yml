@@ -60,7 +60,7 @@
     msg: "The variable 'scale_version' doesn't seem to match the contents of the remote installation package!"
 
 #
-# Inform user about update
+# Fail upon online update
 #
 - include_tasks: scale_update.yml
   when: scale_daemon_running == true

@@ -7,7 +7,8 @@
   changed_when: false
   failed_when: false
 
-# TODO: print this message at the end of the play (set_fact)
+# TODO: fail if GPFS is running on >= one node
 - name: update | Compare versions
-  debug: msg="Spectrum Scale is running. Please stop it for an update!"
-  when: scale_version != scale_current_version.stdout
+  assert:
+    that: scale_version == scale_current_version.stdout
+    msg: Spectrum Scale is running. Please stop it for an update!

@@ -14,7 +14,7 @@
   when: ansible_pkg_mgr == 'yum'
 
 #
-# Inform user about update
+# Fail upon online update
 #
 - include_tasks: scale_update.yml
   when: scale_daemon_running == true
