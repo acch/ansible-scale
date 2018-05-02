@@ -109,13 +109,10 @@
       register: scale_storage_changefile
 
     - block:  ## when: scale_storage_changefile is changed
-        - name: cluster | Find new quorum nodes
-          set_fact: scale_cluster_quorum_nodes="{{ scale_cluster_quorum_nodes | default([]) }} + [ '{{ hostvars[item].scale_daemon_nodename }}' ]"
-          when: hostvars[item].scale_cluster_quorum | bool
-          with_items: "{{ ansible_play_hosts }}"
-
-        - name: cluster | Accept server license on new quorum nodes
-          command: "/usr/lpp/mmfs/bin/mmchlicense server --accept -N {{ scale_cluster_quorum_nodes | join(',') }}"
+        - name: cluster | Accept server license on quorum nodes
+          vars:
+            quorum_nodes: "{{ groups['scale_cluster_quorum_nodes'] | map('extract', hostvars, 'scale_daemon_nodename') | list }}"
+          command: "/usr/lpp/mmfs/bin/mmchlicense server --accept -N {{ quorum_nodes | join(',') }}"
 
         - name: cluster | Change roles of existing node(s)
           command: /usr/lpp/mmfs/bin/mmchnode -S /var/tmp/ChangeFile
