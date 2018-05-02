@@ -1,9 +1,10 @@
 ---
 # Start daemon on new nodes (candidates)
 
-- name: cluster-start | Start daemons
+- name: cluster | Start daemons
   command: /usr/lpp/mmfs/bin/mmstartup -N localhost
-  when: "'scale_cluster_candidates' in group_names"
+  #when: 'scale_cluster_candidates' in group_names  ## only start new nodes
+  when: not scale_daemon_running  ## start all nodes
   notify: wait-daemon-active
 
 - meta: flush_handlers
