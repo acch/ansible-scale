@@ -110,4 +110,11 @@
       with_items:
         - "{{ scale_install_gpfs_rpms }}"
         - "{{ scale_install_gpfs_gskit.files.0.path | basename | regex_replace('.rpm$', '') }}"
+
+    - name: install | Install GPFS RPMs for building GPL module from source
+      yum: name=/usr/lpp/mmfs/{{ scale_version }}/gpfs_rpms/{{ item }}.rpm state=present
+      when:
+        - ansible_pkg_mgr == 'yum'
+        - scale_build_gplbin_rpm is undefined
+      with_items: "{{ scale_install_gplsrc_rpms }}"
   when: scale_daemon_running == false
