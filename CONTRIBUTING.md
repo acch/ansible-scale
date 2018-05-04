@@ -33,7 +33,7 @@ Code guide
 
 - Only quote if necessary:
 
-  String starts with a YAML control character: `-`, `{`, `}`, `[`, `]`, `*`, `&`, `?`, `|`, `>`, `!`, `%`, *`*, `#`, `@`, `:`
+  String starts with a YAML control character: `-`, `{`, `}`, `[`, `]`, `*`, `&`, `?`, `|`, `>`, `!`, `%`, *&#96;*, `#`, `@`, `:`
 
   String contains colon `:` followed by space
 
