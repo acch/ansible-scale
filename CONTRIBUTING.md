@@ -37,7 +37,7 @@ Code guide
 
   * String contains colon `:` followed by space
 
-  * String is a boolean value which should be preserved as string
+  * String is boolean value (`yes`, `false`, ...) which should be preserved as string
 
 - Adhere to following order of declarations:
 
