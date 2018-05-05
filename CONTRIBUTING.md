@@ -33,13 +33,13 @@ Code guide
 
 - Only quote if necessary:
 
-  String starts with a YAML control character: `-`, `{`, `}`, `[`, `]`, `*`, `&`, `?`, `|`, `>`, `!`, `%`, *&#96;*, `#`, `@`, `:`
+  * String starts with a YAML control character: `-`, `{`, `}`, `[`, `]`, `*`, `&`, `?`, `|`, `>`, `!`, `%`, <code>&#96;</code>, `#`, `@`, `:`
 
-  String contains colon `:` followed by space
+  * String contains colon `:` followed by space
 
-  String is a boolean value which should be preserved as string
+  * String is a boolean value which should be preserved as string
 
-- Adhere to standard sequence of declarations:
+- Adhere to following order of declarations:
 
   ```
   - name: tag | Task description
