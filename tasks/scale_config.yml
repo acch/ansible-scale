@@ -79,7 +79,7 @@
       when:
         - not scale_config_existing_params.stdout | lower is search(':' + current_key | lower + ':' + current_value | lower + ':(.+,)?' + current_nodeclass | lower | regex_replace('all', '') + '(,.+)?:')
       with_subelements:
-        - "{{ ansible_play_hosts | map('extract', hostvars, 'scale_config') | sum(start=[]) }}"
+        - "{{ ansible_play_hosts | map('extract', hostvars, 'scale_config') | sum(start=[]) | unique }}"
         - params
 
     # TODO: print this message at the end of the play (set_fact)
