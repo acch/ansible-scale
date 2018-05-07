@@ -5,7 +5,7 @@
 # Inspect existing, free, and defined NSDs
 #
 - block:  ## run_once: true
-    - name: storage | Find existing filesystems
+    - name: storage | Find existing filesystem(s)
       shell: "/usr/lpp/mmfs/bin/mmlsfs all -Y | grep -v HEADER | cut -d ':' -f 7 | uniq"
       register: scale_storage_existing_fs
       changed_when: false
@@ -140,7 +140,7 @@
       with_items: "{{ scale_storage_fsdefs }}"
       changed_when: false
 
-    - name: storage | Extend existing filesystems
+    - name: storage | Extend existing filesystem(s)
       command: /usr/lpp/mmfs/bin/mmadddisk {{ item.item }} -F /var/tmp/StanzaFile.new.{{ item.item }}
       when:
         - item.item in scale_storage_existing_fs.stdout_lines
@@ -242,7 +242,7 @@
 #
 # Change existing filesystems
 #
-    - name: storage | Find filesystems with changed parameters
+    - name: storage | Find filesystem(s) with changed parameters
       set_fact:
         scale_storage_changed_fs: "{{ scale_storage_changed_fs | default([]) + [ item.key ] }}"
       when:

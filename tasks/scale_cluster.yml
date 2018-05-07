@@ -97,7 +97,7 @@
       template: src=AddNodeFile.j2 dest=/var/tmp/NodeFile
       changed_when: false
 
-    - name: cluster | Add new node(s) to cluster
+    - name: cluster | Add new nodes to cluster
       command: /usr/lpp/mmfs/bin/mmaddnode -N /var/tmp/NodeFile
       notify: accept-licenses
 

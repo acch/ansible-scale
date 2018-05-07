@@ -21,12 +21,12 @@
       register: scale_storage_changefile
 
     - block:  ## when: scale_storage_changefile is changed
-        - name: cluster | Accept server license on quorum nodes
+        - name: cluster | Accept server license for quorum nodes
           vars:
             quorum_nodes: "{{ groups['scale_cluster_quorum_nodes'] | map('extract', hostvars, 'scale_daemon_nodename') | list }}"
           command: "/usr/lpp/mmfs/bin/mmchlicense server --accept -N {{ quorum_nodes | join(',') }}"
 
-        - name: cluster | Change roles of existing node(s)
+        - name: cluster | Change roles of existing nodes
           command: /usr/lpp/mmfs/bin/mmchnode -S /var/tmp/ChangeFile
           notify: accept-licenses
 
