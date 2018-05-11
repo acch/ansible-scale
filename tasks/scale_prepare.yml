@@ -2,13 +2,14 @@
 # Prepare node for installation
 
 - name: prepare | Disable SELinux
-  selinux: state=disabled
+  selinux:
+    state: disabled
   notify: reboot
 
 - name: prepare | Add Spectrum Scale directory to PATH
   lineinfile:
     path: /root/.bashrc
-    line: "PATH=$PATH:/usr/lpp/mmfs/bin"
+    line: PATH=$PATH:/usr/lpp/mmfs/bin
     state: present
 
 #
@@ -17,16 +18,16 @@
 - name: prepare | Enable SSH root login
   lineinfile:
     path: /etc/ssh/sshd_config
-    regexp: "PermitRootLogin"
-    line: "PermitRootLogin yes"
+    regexp: PermitRootLogin
+    line: PermitRootLogin yes
     state: present
   notify: reload-sshd
 
 - name: prepare | Enable SSH pubkey authentication
   lineinfile:
     path: /etc/ssh/sshd_config
-    regexp: "PubkeyAuthentication"
-    line: "PubkeyAuthentication yes"
+    regexp: PubkeyAuthentication
+    line: PubkeyAuthentication yes
     state: present
   notify: reload-sshd
 
@@ -38,15 +39,16 @@
 - name: prepare | Disable SSH hostkey checking
   lineinfile:
     path: /etc/ssh/ssh_config
-    regexp: "StrictHostKeyChecking"
-    line: "StrictHostKeyChecking no"
+    regexp: StrictHostKeyChecking
+    line: StrictHostKeyChecking no
     state: present
 
 #
 # Exchange SSH keys
 #
 - name: prepare | Read public SSH key
-  slurp: src={{ scale_prepare_pubkey_path }}
+  slurp:
+    src: "{{ scale_prepare_pubkey_path }}"
   register: scale_prepare_pubkey
 
 - name: prepare | Authorize all SSH keys

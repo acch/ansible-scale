@@ -3,11 +3,13 @@
 
 # Make default variables available in hostvars
 - name: cluster | Set default quorum role
-  set_fact: scale_cluster_quorum={{ scale_cluster_quorum }}
+  set_fact:
+    scale_cluster_quorum: "{{ scale_cluster_quorum }}"
   when: hostvars[inventory_hostname].scale_cluster_quorum is undefined
 
 - name: cluster | Set default manager role
-  set_fact: scale_cluster_manager={{ scale_cluster_manager }}
+  set_fact:
+    scale_cluster_manager: "{{ scale_cluster_manager }}"
   when: hostvars[inventory_hostname].scale_cluster_manager is undefined
 
 # Cleanup groups from previous play
@@ -17,7 +19,7 @@
 # Inspect existing cluster and inventory
 #
 - name: cluster | Find existing cluster
-  shell: "/usr/lpp/mmfs/bin/mmlscluster -Y | grep -v HEADER | grep clusterSummary | cut -d ':' -f 8"
+  shell: /usr/lpp/mmfs/bin/mmlscluster -Y | grep -v HEADER | grep clusterSummary | cut -d ':' -f 8
   register: scale_cluster_clusterId
   changed_when: false
   failed_when: false
@@ -41,12 +43,12 @@
   with_items: "{{ ansible_play_hosts }}"
   changed_when: false
 
-
 #
 # Assign default quorum nodes
 #
 - name: cluster | Assign default quorum nodes
-  set_fact: scale_cluster_quorum=true
+  set_fact:
+    scale_cluster_quorum: true
   when: not true in ansible_play_hosts | map('extract', hostvars, 'scale_cluster_quorum') | map('bool') | list
   with_sequence: start=1 end={{ [ ansible_play_hosts | length, 7 ] | min }}
   run_once: true
@@ -61,13 +63,14 @@
   with_items: "{{ ansible_play_hosts }}"
   changed_when: false
 
-
 #
 # Create new cluster
 #
 - block:  ## when: groups['scale_cluster_members'] is undefined
     - name: cluster | Prepare new cluster NodeFile
-      template: src=NewNodeFile.j2 dest=/var/tmp/NodeFile
+      template:
+        src: NewNodeFile.j2
+        dest: /var/tmp/NodeFile
       changed_when: false
 
     - name: cluster | Create new cluster
@@ -77,11 +80,15 @@
     - meta: flush_handlers
 
     - name: cluster | Cleanup new cluster NodeFile
-      file: path=/var/tmp/NodeFile state=absent
+      file:
+        path: /var/tmp/NodeFile
+        state: absent
       changed_when: false
 
     - name: cluster | Prepare new cluster ChangeFile for next run
-      template: src=ChangeFile.j2 dest=/var/tmp/ChangeFile
+      template:
+        src: ChangeFile.j2
+        dest: /var/tmp/ChangeFile
       changed_when: false
   when:
     - groups['scale_cluster_candidates'] is defined
@@ -94,7 +101,9 @@
 #
 - block:  ## when: groups['scale_cluster_members'] is defined
     - name: cluster | Prepare existing cluster NodeFile
-      template: src=AddNodeFile.j2 dest=/var/tmp/NodeFile
+      template:
+        src: AddNodeFile.j2
+        dest: /var/tmp/NodeFile
       changed_when: false
 
     - name: cluster | Add new nodes to cluster
@@ -104,7 +113,9 @@
     - meta: flush_handlers
 
     - name: cluster | Cleanup existing cluster NodeFile
-      file: path=/var/tmp/NodeFile state=absent
+      file:
+        path: /var/tmp/NodeFile
+        state: absent
       changed_when: false
   when:
     - groups['scale_cluster_candidates'] is defined

@@ -2,10 +2,14 @@
 # Handlers for the IBM Spectrum Scale (GPFS) role
 
 - name: reboot
-  fail: msg="A server reboot is required!"
+  fail:
+    msg: >-
+      A server reboot is required!
 
 - name: reload-sshd
-  service: name=sshd state=reloaded
+  service:
+    name: sshd
+    state: reloaded
 
 - name: accept-server-licenses
   command: /usr/lpp/mmfs/bin/mmchlicense server --accept -N serverLicense
@@ -18,9 +22,9 @@
   failed_when: false
 
 - name: wait-daemon-active
-  shell: "/usr/lpp/mmfs/bin/mmgetstate -N localhost -Y | grep -v HEADER | cut -d ':' -f 9"
+  shell: /usr/lpp/mmfs/bin/mmgetstate -N localhost -Y | grep -v HEADER | cut -d ':' -f 9
   register: state
-  until: state.stdout == "active"
+  until: state.stdout == 'active'
   retries: 10
   delay: 30
   changed_when: false

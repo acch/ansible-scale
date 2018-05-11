@@ -6,31 +6,31 @@
 #
 - block:  ## run_once: true
     - name: storage | Find existing filesystem(s)
-      shell: "/usr/lpp/mmfs/bin/mmlsfs all -Y | grep -v HEADER | cut -d ':' -f 7 | uniq"
+      shell: /usr/lpp/mmfs/bin/mmlsfs all -Y | grep -v HEADER | cut -d ':' -f 7 | uniq
       register: scale_storage_existing_fs
       changed_when: false
       failed_when: false
 
     - name: storage | Find current filesystem mounts
-      shell: "/usr/lpp/mmfs/bin/mmlsmount all -Y | grep -v HEADER"
+      shell: /usr/lpp/mmfs/bin/mmlsmount all -Y | grep -v HEADER
       register: scale_storage_existing_fsmounts
       changed_when: false
       failed_when: false
 
     - name: storage | Find current filesystem parameters
-      shell: "/usr/lpp/mmfs/bin/mmlsfs all -Y | grep -v HEADER"
+      shell: /usr/lpp/mmfs/bin/mmlsfs all -Y | grep -v HEADER
       register: scale_storage_existing_fsparams
       changed_when: false
       failed_when: false
 
     - name: storage | Find existing NSDs
-      shell: "/usr/lpp/mmfs/bin/mmlsnsd -a -Y | grep -v HEADER | cut -d ':' -f 8"
+      shell: /usr/lpp/mmfs/bin/mmlsnsd -a -Y | grep -v HEADER | cut -d ':' -f 8
       register: scale_storage_existing_nsds
       changed_when: false
       failed_when: false
 
     - name: storage | Find free NSDs
-      shell: "/usr/lpp/mmfs/bin/mmlsnsd -F -Y | grep -v HEADER | cut -d ':' -f 8"
+      shell: /usr/lpp/mmfs/bin/mmlsnsd -F -Y | grep -v HEADER | cut -d ':' -f 8
       register: scale_storage_free_nsds
       changed_when: false
       failed_when: false
@@ -72,7 +72,9 @@
       vars:
         current_fs: "{{ item }}"
         current_nsds: "{{ scale_storage_nsddefs | difference(scale_storage_existing_nsds.stdout_lines) }}"  ## only non-existing NSDs
-      template: src=StanzaFile.j2 dest=/var/tmp/StanzaFile.new.{{ current_fs }}
+      template:
+        src: StanzaFile.j2
+        dest: /var/tmp/StanzaFile.new.{{ current_fs }}
       register: scale_storage_stanzafile_new
       with_items: "{{ scale_storage_fsdefs }}"
       changed_when: false
@@ -97,7 +99,9 @@
       vars:
         current_fs: "{{ item }}"
         current_nsds: "{{ scale_storage_nsddefs }}"  ## all defined NSDs
-      template: src=StanzaFile.j2 dest=/var/tmp/StanzaFile.new.{{ current_fs }}
+      template:
+        src: StanzaFile.j2
+        dest: /var/tmp/StanzaFile.new.{{ current_fs }}
       register: scale_storage_stanzafile_new
       when:
         - current_fs not in scale_storage_existing_fs.stdout_lines
@@ -105,11 +109,12 @@
       changed_when: false
 
     - name: storage | Create new filesystem(s)
-      command: /usr/lpp/mmfs/bin/mmcrfs {{ item.item }} \
-        -F /var/tmp/StanzaFile.new.{{ item.item }} \
-        -B {{ scale_storage_fsparams[item.item].blockSize | default(scale_storage_filesystem_defaults.blockSize) }} \
-        -m {{ scale_storage_fsparams[item.item].defaultMetadataReplicas | default(scale_storage_filesystem_defaults.defaultMetadataReplicas) }} \
-        -r {{ scale_storage_fsparams[item.item].defaultDataReplicas | default(scale_storage_filesystem_defaults.defaultDataReplicas) }} \
+      command: >
+        /usr/lpp/mmfs/bin/mmcrfs {{ item.item }}
+        -F /var/tmp/StanzaFile.new.{{ item.item }}
+        -B {{ scale_storage_fsparams[item.item].blockSize | default(scale_storage_filesystem_defaults.blockSize) }}
+        -m {{ scale_storage_fsparams[item.item].defaultMetadataReplicas | default(scale_storage_filesystem_defaults.defaultMetadataReplicas) }}
+        -r {{ scale_storage_fsparams[item.item].defaultDataReplicas | default(scale_storage_filesystem_defaults.defaultDataReplicas) }}
         -n {{ scale_storage_fsparams[item.item].numNodes | default(scale_storage_filesystem_defaults.numNodes) }}
         -A {{ 'yes' if scale_storage_fsparams[item.item].automaticMountOption | default(scale_storage_filesystem_defaults.automaticMountOption) else 'no' }}
         -T {{ scale_storage_fsparams[item.item].defaultMountPoint | default(scale_storage_filesystem_defaults.defaultMountPoint_prefix + item.item) }}
@@ -133,7 +138,9 @@
       vars:
         current_fs: "{{ item }}"
         current_nsds: "{{ scale_storage_nsddefs | difference(scale_storage_existing_nsds.stdout_lines) | union(scale_storage_free_nsds.stdout_lines) }}"  ## only non-existing and free NSDs
-      template: src=StanzaFile.j2 dest=/var/tmp/StanzaFile.new.{{ current_fs }}
+      template:
+        src: StanzaFile.j2
+        dest: /var/tmp/StanzaFile.new.{{ current_fs }}
       register: scale_storage_stanzafile_new
       when:
         - current_fs in scale_storage_existing_fs.stdout_lines
@@ -151,7 +158,9 @@
 # Cleanup
 #
     - name: storage | Cleanup new NSD StanzaFile(s)
-      file: path=/var/tmp/StanzaFile.new.{{ item }} state=absent
+      file:
+        path: /var/tmp/StanzaFile.new.{{ item }}
+        state: absent
       with_items: "{{ scale_storage_fsdefs }}"
       changed_when: false
 
@@ -162,7 +171,9 @@
       vars:
         current_fs: "{{ item }}"
         current_nsds: "{{ scale_storage_existing_nsds.stdout_lines }}"  ## only existing NSDs
-      template: src=StanzaFile.j2 dest=/var/tmp/StanzaFile.{{ current_fs }}
+      template:
+        src: StanzaFile.j2
+        dest: /var/tmp/StanzaFile.{{ current_fs }}
       register: scale_storage_stanzafile_existing
       with_items: "{{ scale_storage_fsdefs }}"
 
@@ -170,7 +181,7 @@
       copy:
         src: /var/tmp/StanzaFile.{{ item.item }}
         dest: /var/tmp/StanzaFile.{{ item.item }}.nsd
-        remote_src: yes
+        remote_src: true
       when:
         - item.item in scale_storage_existing_fs.stdout_lines
         - item is changed
@@ -180,7 +191,7 @@
     - name: storage | Filter temp existing NSD StanzaFile(s)
       replace:
         path: /var/tmp/StanzaFile.{{ item.item }}.nsd
-        regexp: '^\s*(usage|failureGroup|pool)=.*\n'
+        regexp: ^\s*(usage|failureGroup|pool)=.*\n
       when:
         - item.item in scale_storage_existing_fs.stdout_lines
         - item is changed
@@ -208,7 +219,9 @@
 # Cleanup
 #
     - name: storage | Cleanup temp existing NSD StanzaFile(s)
-      file: path=/var/tmp/StanzaFile.{{ item.item }}.nsd state=absent
+      file:
+        path: /var/tmp/StanzaFile.{{ item.item }}.nsd
+        state: absent
       when:
         - item.item in scale_storage_existing_fs.stdout_lines
         - item is changed
@@ -234,7 +247,9 @@
       vars:
         current_fs: "{{ item }}"
         current_nsds: "{{ scale_storage_nsddefs }}"  ## all defined NSDs
-      template: src=StanzaFile.j2 dest=/var/tmp/StanzaFile.{{ current_fs }}
+      template:
+        src: StanzaFile.j2
+        dest: /var/tmp/StanzaFile.{{ current_fs }}
       when: scale_storage_nsddefs | difference(scale_storage_existing_nsds.stdout_lines) | union(scale_storage_free_nsds.stdout_lines) | length > 0
       with_items: "{{ scale_storage_fsdefs }}"
       changed_when: false
@@ -255,9 +270,10 @@
       with_dict: "{{ scale_storage_fsparams | default({}) }}"
 
     - name: storage | Change online filesystem parameters
-      command: /usr/lpp/mmfs/bin/mmchfs {{ item.key }} \
-        -m {{ item.value.defaultMetadataReplicas | default(scale_storage_filesystem_defaults.defaultMetadataReplicas) }} \
-        -r {{ item.value.defaultDataReplicas | default(scale_storage_filesystem_defaults.defaultDataReplicas) }} \
+      command: >
+        /usr/lpp/mmfs/bin/mmchfs {{ item.key }}
+        -m {{ item.value.defaultMetadataReplicas | default(scale_storage_filesystem_defaults.defaultMetadataReplicas) }}
+        -r {{ item.value.defaultDataReplicas | default(scale_storage_filesystem_defaults.defaultDataReplicas) }}
         -n {{ item.value.numNodes | default(scale_storage_filesystem_defaults.numNodes) }}
         -A {{ 'yes' if item.value.automaticMountOption | default(scale_storage_filesystem_defaults.automaticMountOption) else 'no' }}
       when:
@@ -265,7 +281,8 @@
       with_dict: "{{ scale_storage_fsparams | default({}) }}"
 
     - name: storage | Change offline filesystem parameters
-      command: /usr/lpp/mmfs/bin/mmchfs {{ item.key }} \
+      command: >
+        /usr/lpp/mmfs/bin/mmchfs {{ item.key }}
         -T {{ item.value.defaultMountPoint | default(scale_storage_filesystem_defaults.defaultMountPoint_prefix + item.key) }}
       when:
         - item.key in scale_storage_changed_fs | default([])

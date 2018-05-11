@@ -26,7 +26,7 @@
     - name: install | Install GPFS RPMs
       yum:
         name: "{{ item }}"
-        update_cache: yes
+        update_cache: true
         state: present
       when: ansible_pkg_mgr == 'yum'
       with_items:
@@ -36,21 +36,10 @@
     - name: install | Install GPFS RPMs for building GPL module from source
       yum:
         name: "{{ item }}"
-        update_cache: yes
+        update_cache: true
         state: present
       when:
         - ansible_pkg_mgr == 'yum'
         - scale_build_gplbin_rpm is undefined
       with_items: "{{ scale_install_gplsrc_rpms }}"
   when: scale_daemon_running == false
-
-
-# TODO: online upgrade as separate playbook
-# ... serial ...
-# - block:
-#     - stop GPFS on node
-#     - upgrade GPFS rpms
-#   rescue:
-#     - debug: msg='Can't upgrade GPFS!'
-#   always:
-#     - start GPFS on node

@@ -9,7 +9,9 @@
 # Install gplbin prereqs
 #
     - name: build | Install dependencies for pre-built GPL module
-      yum: name={{ item }} state=present
+      yum:
+        name: "{{ item }}"
+        state: present
       when: ansible_pkg_mgr == 'yum'
       with_items: "{{ scale_build_gplbin_prereqs }}"
 
@@ -24,8 +26,8 @@
         gpgcheck: no
         state: present
       when:
-        - scale_build_gplbin_repository_url is defined
         - ansible_pkg_mgr == 'yum'
+        - scale_build_gplbin_repository_url is defined
 
 #
 # Install kernel extension RPM
@@ -33,7 +35,7 @@
     - name: build | Install GPL module RPMs
       yum:
         name: "{{ scale_build_gplbin_rpm }}"
-        update_cache: yes
+        update_cache: true
         state: present
       when: ansible_pkg_mgr == 'yum'
   when: scale_build_gplbin_rpm is defined
@@ -47,7 +49,9 @@
 # Install gplsrc prereqs
 #
     - name: build | Install prereqs for building GPL module from source
-      yum: name={{ item }} state=present
+      yum:
+        name: "{{ item }}"
+        state: present
       when: ansible_pkg_mgr == 'yum'
       with_items: "{{ scale_build_gplsrc_prereqs }}"
 
@@ -55,34 +59,40 @@
 # Identify Linux Distribution
 #
     - name: build | Identify RedHat distribution
-      set_fact: scale_build_distribution="REDHAT_AS_LINUX"
-      when:
-        - ansible_distribution == "CentOS" or
-          ansible_distribution == "RedHat"
+      set_fact:
+        scale_build_distribution: REDHAT_AS_LINUX
+      when: >
+        ansible_distribution == 'CentOS' or
+        ansible_distribution == 'RedHat'
 
-    #- name: build | Identify SUSE distribution
-    #  set_fact: scale_build_distribution="SUSE_LINUX"
-    #  when: ansible_distribution == "Suse"
+    #- name: build | Identify Suse distribution
+    #  set_fact:
+    #    scale_build_distribution: SUSE_LINUX
+    #  when: ansible_distribution == 'Suse'
 
     - name: check | Check Linux distribution
       assert:
         that: scale_build_distribution is defined
-        msg: "Unsupported Linux distribution {{ ansible_distribution }}!"
+        msg: >-
+          Unsupported Linux distribution {{ ansible_distribution }}!
 
 #
 # Build kernel extension
 #
     - name: build | Compile GPL module
-      shell: "export LINUX_DISTRIBUTION={{ scale_build_distribution }} ; /usr/lpp/mmfs/bin/mmbuildgpl --quiet"
+      shell: export LINUX_DISTRIBUTION={{ scale_build_distribution }} ; /usr/lpp/mmfs/bin/mmbuildgpl --quiet
       args:
         creates: /lib/modules/{{ ansible_kernel }}/extra/mmfs26.ko  ## TODO: upon GPFS update mmbuildgpl will be skipped!
 
     - name: build | Stat GPL module
-      stat: path=/lib/modules/{{ ansible_kernel }}/extra/mmfs26.ko
+      stat:
+        path: /lib/modules/{{ ansible_kernel }}/extra/mmfs26.ko
       register: scale_build_kmod
 
     - name: build | Check GPL module
       assert:
         that: scale_build_kmod.stat.exists
-        msg: "Unable to build Linux kernel extension for running kernel {{ ansible_kernel }}!"
+        msg: >-
+          Unable to build Linux kernel extension for running kernel
+          {{ ansible_kernel }}!
   when: scale_build_gplbin_rpm is undefined
