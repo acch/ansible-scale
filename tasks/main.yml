@@ -1,5 +1,5 @@
 ---
-# Install IBM Spectrum Scale (GPFS)
+# Install and configure IBM Spectrum Scale (GPFS)
 
 - import_tasks: scale_check.yml
   tags: always
