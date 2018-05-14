@@ -180,7 +180,7 @@ scale_storage:
 
 Note that filesystem parameters can be defined as variables for *any* host in the play &mdash; the host for which you define the filesystem parameters is irrelevant. For disk parameters the host is only relevant if you omit the `servers` variable. When omitting the `servers` variable then the host for which you define the disk is automatically considered the (only) NSD server for that particular disk.
 
-Furthermore, node classes can be defined on a per-node basis by defining the `scale_nodeclass` variable:
+Furthermore, Spectrum Scale node classes can be defined on a per-node basis by defining the `scale_nodeclass` variable:
 
 ```
 # host_vars/scale01:
@@ -197,10 +197,10 @@ scale_nodeclass:
   - classC
 ```
 
-These node classes can optionally be used to define Spectrum Scale configuration parameters:
+These node classes can optionally be used to define Spectrum Scale configuration parameters. It's suggested to use group_vars inventory files for that purpose:
 
 ```
-# host_vars/scale01:
+# group_vars/all:
 ---
 scale_config:
   - nodeclass: classA
