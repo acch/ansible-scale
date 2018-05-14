@@ -197,7 +197,7 @@ scale_nodeclass:
   - classC
 ```
 
-These node classes can optionally be used to define Spectrum Scale configuration parameters. It's suggested to use group_vars inventory files for that purpose:
+These node classes can optionally be used to define Spectrum Scale configuration parameters. It's suggested to use `group_vars` inventory files for that purpose:
 
 ```
 # group_vars/all:
