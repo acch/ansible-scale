@@ -39,6 +39,8 @@ Code guide
 
   * String is boolean value (`yes`, `false`, ...) which should be preserved as string
 
+  * String in Jinja2 / `when:` / `until:` statement
+
 - Adhere to following order of declarations:
 
   ```
