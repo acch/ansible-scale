@@ -77,7 +77,6 @@
         dest: /var/tmp/StanzaFile.new.{{ current_fs }}
       register: scale_storage_stanzafile_new
       with_items: "{{ scale_storage_fsdefs }}"
-      changed_when: false
 
     - name: storage | Accept server license for NSD servers
       command: /usr/lpp/mmfs/bin/mmchlicense server --accept -N "{{ scale_storage_nsdservers | join(',') }}"
@@ -106,7 +105,6 @@
       when:
         - current_fs not in scale_storage_existing_fs.stdout_lines
       with_items: "{{ scale_storage_fsdefs }}"
-      changed_when: false
 
     - name: storage | Create new filesystem(s)
       command: >
@@ -145,7 +143,6 @@
       when:
         - current_fs in scale_storage_existing_fs.stdout_lines
       with_items: "{{ scale_storage_fsdefs }}"
-      changed_when: false
 
     - name: storage | Extend existing filesystem(s)
       command: /usr/lpp/mmfs/bin/mmadddisk {{ item.item }} -F /var/tmp/StanzaFile.new.{{ item.item }}
@@ -162,7 +159,6 @@
         path: /var/tmp/StanzaFile.new.{{ item }}
         state: absent
       with_items: "{{ scale_storage_fsdefs }}"
-      changed_when: false
 
 #
 # Change existing NSDs
@@ -227,7 +223,6 @@
         - item is changed
         - item.size > 1
       with_items: "{{ scale_storage_stanzafile_existing.results }}"
-      changed_when: false
 
 #
 # Change existing disks
@@ -252,7 +247,6 @@
         dest: /var/tmp/StanzaFile.{{ current_fs }}
       when: scale_storage_nsddefs | difference(scale_storage_existing_nsds.stdout_lines) | union(scale_storage_free_nsds.stdout_lines) | length > 0
       with_items: "{{ scale_storage_fsdefs }}"
-      changed_when: false
 
 #
 # Change existing filesystems
