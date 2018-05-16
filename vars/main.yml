@@ -12,3 +12,6 @@ scale_rpmversion: "{{ scale_version | regex_replace('^([0-9.]+)\\.([0-9])$', '\\
 ## Supported package managers
 scale_pkg_mgr:
   - yum
+
+## Remember if RPMs were updated or not
+scale_install_updated: false

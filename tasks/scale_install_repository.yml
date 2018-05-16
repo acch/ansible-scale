@@ -20,23 +20,37 @@
   when: scale_daemon_running == true
 
 #
-# Install RPMs
+# Install or update RPMs
 #
 - block:  ## when: scale_daemon_running == false
+    - name: install | List installed GPFS RPMs
+      yum:
+        list: gpfs.base
+        disablerepo: spectrum-scale-gpfs
+      register: scale_install_rpmlist
+      when: ansible_pkg_mgr == 'yum'
+
     - name: install | Install GPFS RPMs
       yum:
         name: "{{ item }}"
         update_cache: true
         state: present
+      register: scale_install_rpmresult
       when: ansible_pkg_mgr == 'yum'
       with_items:
         - "{{ scale_install_gpfs_rpms }}"
         - gpfs.gskit
 
+    - name: install | Check if GPFS RPMs were updated
+      set_fact:
+        scale_install_updated: true
+      when:
+        - "'installed' in scale_install_rpmlist.results | map(attribute='yumstate') | list"
+        - scale_install_rpmresult.changed
+
     - name: install | Install GPFS RPMs for building GPL module from source
       yum:
         name: "{{ item }}"
-        update_cache: true
         state: present
       when:
         - ansible_pkg_mgr == 'yum'

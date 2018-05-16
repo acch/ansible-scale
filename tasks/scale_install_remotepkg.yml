@@ -77,7 +77,7 @@
   when: scale_daemon_running == true
 
 #
-# Install RPMs
+# Install or update RPMs
 #
 - block:  ## when: scale_daemon_running == false
     - name: install | Find Global Security Kit (GSKit) RPM
@@ -93,14 +93,28 @@
           No Global Security Kit (GSKit) RPM found:
           /usr/lpp/mmfs/{{ scale_version }}/gpfs_rpms/gpfs.gskit-*.{{ scale_architecture }}.rpm
 
+    - name: install | List installed GPFS RPMs
+      yum:
+        list: gpfs.base
+      register: scale_install_rpmlist
+      when: ansible_pkg_mgr == 'yum'
+
     - name: install | Install GPFS RPMs
       yum:
         name: /usr/lpp/mmfs/{{ scale_version }}/gpfs_rpms/{{ item }}.rpm
         state: present
+      register: scale_install_rpmresult
       when: ansible_pkg_mgr == 'yum'
       with_items:
         - "{{ scale_install_gpfs_rpms }}"
         - "{{ scale_install_gpfs_gskit.files.0.path | basename | regex_replace('\\.rpm$', '') }}"
+
+    - name: install | Check if GPFS RPMs were updated
+      set_fact:
+        scale_install_updated: true
+      when:
+        - "'installed' in scale_install_rpmlist.results | map(attribute='yumstate') | list"
+        - scale_install_rpmresult.changed
 
     - name: install | Install GPFS RPMs for building GPL module from source
       yum:
