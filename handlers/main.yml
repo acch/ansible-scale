@@ -11,6 +11,11 @@
     name: sshd
     state: reloaded
 
+- name: yum-clean-metadata
+  command: yum clean metadata
+  args:
+    warn: no
+
 - name: accept-server-licenses
   command: /usr/lpp/mmfs/bin/mmchlicense server --accept -N serverLicense
   listen: accept-licenses

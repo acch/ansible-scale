@@ -25,6 +25,7 @@
         baseurl: "{{ scale_build_gplbin_repository_url }}"
         gpgcheck: no
         state: present
+      notify: yum-clean-metadata
       when:
         - ansible_pkg_mgr == 'yum'
         - scale_build_gplbin_repository_url is defined
@@ -82,7 +83,7 @@
     - name: build | Compile GPL module
       shell: export LINUX_DISTRIBUTION={{ scale_build_distribution }} ; /usr/lpp/mmfs/bin/mmbuildgpl --quiet
       args:
-        creates: /lib/modules/{{ ansible_kernel }}/extra/mmfs26.ko  ## TODO: upon GPFS update mmbuildgpl will be skipped!
+        creates: /lib/modules/{{ ansible_kernel }}/extra/mmfs26.ko
 
     - name: build | Stat GPL module
       stat:

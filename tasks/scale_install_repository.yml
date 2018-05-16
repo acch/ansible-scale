@@ -11,7 +11,10 @@
     baseurl: "{{ scale_install_repository_url }}"
     gpgcheck: no
     state: present
+  notify: yum-clean-metadata
   when: ansible_pkg_mgr == 'yum'
+
+- meta: flush_handlers
 
 #
 # Fail upon online update
@@ -33,7 +36,6 @@
     - name: install | Install GPFS RPMs
       yum:
         name: "{{ item }}"
-        update_cache: true
         state: present
       register: scale_install_rpmresult
       when: ansible_pkg_mgr == 'yum'
