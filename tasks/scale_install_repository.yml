@@ -4,7 +4,7 @@
 #
 # Configure YUM repository
 #
-- name: install | Configure YUM repository
+- name: install | Configure GPFS YUM repository
   yum_repository:
     name: spectrum-scale-gpfs
     description: IBM Spectrum Scale (GPFS)
@@ -14,48 +14,21 @@
   notify: yum-clean-metadata
   when: ansible_pkg_mgr == 'yum'
 
-- meta: flush_handlers
+#
+# Add GPFS RPMs
+#
+- name: install | Add GPFS RPMs to list
+  set_fact:
+    scale_install_all_rpms: "{{ scale_install_all_rpms + [ item ] }}"
+  with_items:
+    - "{{ scale_install_gpfs_rpms }}"
+    - gpfs.gskit
 
 #
-# Fail upon online update
+# Add GPFS RPMs for building GPL module from source
 #
-- include_tasks: scale_update.yml
-  when: scale_daemon_running == true
-
-#
-# Install or update RPMs
-#
-- block:  ## when: scale_daemon_running == false
-    - name: install | List installed GPFS RPMs
-      yum:
-        list: gpfs.base
-        disablerepo: spectrum-scale-gpfs
-      register: scale_install_rpmlist
-      when: ansible_pkg_mgr == 'yum'
-
-    - name: install | Install GPFS RPMs
-      yum:
-        name: "{{ item }}"
-        state: present
-      register: scale_install_rpmresult
-      when: ansible_pkg_mgr == 'yum'
-      with_items:
-        - "{{ scale_install_gpfs_rpms }}"
-        - gpfs.gskit
-
-    - name: install | Check if GPFS RPMs were updated
-      set_fact:
-        scale_install_updated: true
-      when:
-        - "'installed' in scale_install_rpmlist.results | map(attribute='yumstate') | list"
-        - scale_install_rpmresult.changed
-
-    - name: install | Install GPFS RPMs for building GPL module from source
-      yum:
-        name: "{{ item }}"
-        state: present
-      when:
-        - ansible_pkg_mgr == 'yum'
-        - scale_build_gplbin_rpm is undefined
-      with_items: "{{ scale_install_gplsrc_rpms }}"
-  when: scale_daemon_running == false
+- name: install | Add GPFS RPMs for building GPL module from source to list
+  set_fact:
+    scale_install_all_rpms: "{{ scale_install_all_rpms + [ item ] }}"
+  when: scale_install_gplbin_rpm is undefined
+  with_items: "{{ scale_install_gplsrc_rpms }}"

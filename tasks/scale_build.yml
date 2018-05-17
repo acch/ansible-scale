@@ -1,51 +1,7 @@
 ---
-# Build or install Linux kernel extension
-
-#
-# Înstall Linux kernel extension from pre-built RPM
-#
-- block:  ## when: scale_build_gplbin_rpm is defined
-#
-# Install gplbin prereqs
-#
-    - name: build | Install dependencies for pre-built GPL module
-      yum:
-        name: "{{ item }}"
-        state: present
-      when: ansible_pkg_mgr == 'yum'
-      with_items: "{{ scale_build_gplbin_prereqs }}"
-
-#
-# Configure YUM repository
-#
-    - name: build | Configure YUM repository
-      yum_repository:
-        name: spectrum-scale-gplbin
-        description: IBM Spectrum Scale (GPFS) GPL module
-        baseurl: "{{ scale_build_gplbin_repository_url }}"
-        gpgcheck: no
-        state: present
-      notify: yum-clean-metadata
-      when:
-        - ansible_pkg_mgr == 'yum'
-        - scale_build_gplbin_repository_url is defined
-
-#
-# Install kernel extension RPM
-#
-    - name: build | Install GPL module RPMs
-      yum:
-        name: "{{ scale_build_gplbin_rpm }}"
-        update_cache: true
-        state: present
-      when: ansible_pkg_mgr == 'yum'
-  when: scale_build_gplbin_rpm is defined
-
-
-#
 # Build Linux kernel extension from source
-#
-- block:  ## when: scale_build_gplbin_rpm is undefined
+
+- block:  ## when: scale_install_gplbin_rpm is undefined
 #
 # Install gplsrc prereqs
 #
@@ -96,4 +52,4 @@
         msg: >-
           Unable to build Linux kernel extension for running kernel
           {{ ansible_kernel }}!
-  when: scale_build_gplbin_rpm is undefined
+  when: scale_install_gplbin_rpm is undefined

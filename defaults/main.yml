@@ -50,22 +50,22 @@ scale_install_gplsrc_rpms:
 
 ## Define this variable to install Linux kernel extension from pre-built RPM
 ## (instead of building it from source)
-#scale_build_gplbin_rpm: gpfs.gplbin-{{ ansible_kernel }}-{{ scale_rpmversion }}
+#scale_install_gplbin_rpm: gpfs.gplbin-{{ ansible_kernel }}-{{ scale_rpmversion }}
 
 ## Specify the URL of the (existing) YUM repository from which to install
 ## pre-built Linux kernel extension RPM
-#scale_build_gplbin_repository_url: http://infraserv/gplbin_rpms/
+#scale_install_gplbin_repository_url: http://infraserv/gplbin_rpms/
+
+## List of RPMs to install when installing Linux kernel extension
+## from pre-built RPM
+scale_install_gplbin_prereqs:
+  - glibc-devel
 
 ## List of RPMs to install when building Linux kernel extension from source
 scale_build_gplsrc_prereqs:
   - gcc-c++
   - kernel-devel
   - make
-
-## List of RPMs to install when installing Linux kernel extension
-## from pre-built RPM
-scale_build_gplbin_prereqs:
-  - glibc-devel
 
 
 ## Default cluster name

@@ -1,6 +1,9 @@
 ---
-# Choose installation method from configuration variables
+# Install or update RPMs
 
+#
+# Choose installation method from configuration variables
+#
 - block:  ## run_once: true
     - name: install | Check for repository installation method
       set_fact:
@@ -33,6 +36,48 @@
   delegate_to: localhost
 
 #
-# Run chosen installation method
+# Run chosen installation method to get list of RPMs
 #
+- name: install | Initialize list of RPMs
+  set_fact:
+    scale_install_all_rpms: []
+
 - include_tasks: scale_install_{{ scale_installmethod }}.yml
+
+- include_tasks: scale_install_gplbin.yml
+  when: scale_install_gplbin_rpm is defined
+
+- meta: flush_handlers
+
+#
+# Fail upon online update
+#
+- include_tasks: scale_update.yml
+  when: scale_daemon_running == true
+
+#
+# Install or update RPMs
+#
+- block:  ## when: scale_daemon_running == false
+    - name: install | List installed GPFS RPMs
+      yum:
+        list: gpfs.base
+        disablerepo: spectrum-scale-gpfs
+      register: scale_install_rpmlist
+      when: ansible_pkg_mgr == 'yum'
+
+    - name: install | Install GPFS RPMs
+      yum:
+        name: "{{ item }}"
+        state: present
+      register: scale_install_rpmresult
+      when: ansible_pkg_mgr == 'yum'
+      with_items: "{{ scale_install_all_rpms }}"
+
+    - name: install | Check if GPFS RPMs were updated
+      set_fact:
+        scale_install_updated: true
+      when:
+        - "'installed' in scale_install_rpmlist.results | map(attribute='yumstate') | list"
+        - scale_install_rpmresult.changed
+  when: scale_daemon_running == false

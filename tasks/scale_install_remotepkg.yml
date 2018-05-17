@@ -71,57 +71,40 @@
       remote installation package!
 
 #
-# Fail upon online update
+# Find GSKit
 #
-- include_tasks: scale_update.yml
-  when: scale_daemon_running == true
+- name: install | Find Global Security Kit (GSKit) RPM
+  find:
+    paths: /usr/lpp/mmfs/{{ scale_version }}/gpfs_rpms/
+    patterns: gpfs.gskit-*.{{ scale_architecture }}.rpm
+  register: scale_install_gpfs_gskit
+
+- name: install | Check valid Global Security Kit (GSKit) RPM
+  assert:
+    that: scale_install_gpfs_gskit.matched > 0
+    msg: >-
+      No Global Security Kit (GSKit) RPM found:
+      /usr/lpp/mmfs/{{ scale_version }}/gpfs_rpms/gpfs.gskit-*.{{ scale_architecture }}.rpm
 
 #
-# Install or update RPMs
+# Add GPFS RPMs
 #
-- block:  ## when: scale_daemon_running == false
-    - name: install | Find Global Security Kit (GSKit) RPM
-      find:
-        paths: /usr/lpp/mmfs/{{ scale_version }}/gpfs_rpms/
-        patterns: gpfs.gskit-*.{{ scale_architecture }}.rpm
-      register: scale_install_gpfs_gskit
+- name: install | Add GPFS RPMs to list
+  vars:
+    current_rpm: /usr/lpp/mmfs/{{ scale_version }}/gpfs_rpms/{{ item }}.rpm
+  set_fact:
+    scale_install_all_rpms: "{{ scale_install_all_rpms + [ current_rpm ] }}"
+  with_items:
+    - "{{ scale_install_gpfs_rpms }}"
+    - "{{ scale_install_gpfs_gskit.files.0.path | basename | regex_replace('\\.rpm$', '') }}"
 
-    - name: install | Check valid Global Security Kit (GSKit) RPM
-      assert:
-        that: scale_install_gpfs_gskit.matched > 0
-        msg: >-
-          No Global Security Kit (GSKit) RPM found:
-          /usr/lpp/mmfs/{{ scale_version }}/gpfs_rpms/gpfs.gskit-*.{{ scale_architecture }}.rpm
-
-    - name: install | List installed GPFS RPMs
-      yum:
-        list: gpfs.base
-      register: scale_install_rpmlist
-      when: ansible_pkg_mgr == 'yum'
-
-    - name: install | Install GPFS RPMs
-      yum:
-        name: /usr/lpp/mmfs/{{ scale_version }}/gpfs_rpms/{{ item }}.rpm
-        state: present
-      register: scale_install_rpmresult
-      when: ansible_pkg_mgr == 'yum'
-      with_items:
-        - "{{ scale_install_gpfs_rpms }}"
-        - "{{ scale_install_gpfs_gskit.files.0.path | basename | regex_replace('\\.rpm$', '') }}"
-
-    - name: install | Check if GPFS RPMs were updated
-      set_fact:
-        scale_install_updated: true
-      when:
-        - "'installed' in scale_install_rpmlist.results | map(attribute='yumstate') | list"
-        - scale_install_rpmresult.changed
-
-    - name: install | Install GPFS RPMs for building GPL module from source
-      yum:
-        name: /usr/lpp/mmfs/{{ scale_version }}/gpfs_rpms/{{ item }}.rpm
-        state: present
-      when:
-        - ansible_pkg_mgr == 'yum'
-        - scale_build_gplbin_rpm is undefined
-      with_items: "{{ scale_install_gplsrc_rpms }}"
-  when: scale_daemon_running == false
+#
+# Add GPFS RPMs for building GPL module from source
+#
+- name: install | Add GPFS RPMs for building GPL module from source to list
+  vars:
+    current_rpm: /usr/lpp/mmfs/{{ scale_version }}/gpfs_rpms/{{ item }}.rpm
+  set_fact:
+    scale_install_all_rpms: "{{ scale_install_all_rpms + [ current_rpm ] }}"
+  when: scale_install_gplbin_rpm is undefined
+  with_items: "{{ scale_install_gplsrc_rpms }}"
