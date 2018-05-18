@@ -1,5 +1,5 @@
 ---
-# Perform sanity check of configuration variables
+# Sanity check of configuration variables
 
 - name: check | Check Spectrum Scale version
   assert:
