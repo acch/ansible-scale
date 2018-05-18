@@ -7,9 +7,21 @@
   changed_when: false
   failed_when: false
 
-# TODO: fail if GPFS is running on *any* node
-- name: update | Compare versions
-  assert:
-    that: scale_version == scale_current_version.stdout
-    msg: >-
-      Spectrum Scale is running. Please stop it for an update!
+- name: update | Check if node needs to be updated
+  set_fact:
+    scale_install_needsupdate: "{{ scale_current_version.stdout != scale_version }}"
+
+- block:  ## run_once: true
+    - name: update | Check if any running node needs to be updated
+      vars:
+        msg: |-
+          ######################################################################
+          Spectrum Scale is running. Please stop it for an automatic offline
+          update, or manually perform an online update (by taking down one node
+          at a time)!
+          ######################################################################
+      assert:
+        that:
+          - true not in ansible_play_hosts | map('extract', hostvars, 'scale_install_needsupdate') | list
+        msg: "{{ msg.split('\n') }}"
+  run_once: true
