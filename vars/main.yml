@@ -15,3 +15,6 @@ scale_pkg_mgr:
 
 ## Remember if RPMs were updated or not
 scale_install_updated: false
+
+## Remember if config params were changed or not
+scale_config_changed: false

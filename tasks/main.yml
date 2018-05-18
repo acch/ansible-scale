@@ -24,3 +24,6 @@
 
 - import_tasks: scale_storage.yml
   tags: storage
+
+- import_tasks: scale_finalize.yml
+  tags: always
