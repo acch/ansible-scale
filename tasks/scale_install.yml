@@ -26,7 +26,7 @@
         - scale_install_remotepkg_path is undefined
         - scale_install_localpkg_path is defined
 
-    - name: install | Check valid installation method
+    - name: install | Check installation method
       assert:
         that: scale_installmethod is defined
         msg: >-
@@ -53,12 +53,12 @@
 # Fail upon online update
 #
 - include_tasks: scale_update.yml
-  when: scale_daemon_running == true
+  when: scale_daemon_running
 
 #
 # Install or update RPMs
 #
-- block:  ## when: scale_daemon_running == false
+- block:  ## when: not scale_daemon_running
     - name: install | List installed GPFS RPMs
       yum:
         list: gpfs.base
@@ -80,4 +80,4 @@
       when:
         - "'installed' in scale_install_rpmlist.results | map(attribute='yumstate') | list"
         - scale_install_rpmresult.changed
-  when: scale_daemon_running == false
+  when: not scale_daemon_running

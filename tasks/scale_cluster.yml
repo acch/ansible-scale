@@ -49,7 +49,7 @@
 - name: cluster | Assign default quorum nodes
   set_fact:
     scale_cluster_quorum: true
-  when: not true in ansible_play_hosts | map('extract', hostvars, 'scale_cluster_quorum') | map('bool') | list
+  when: true not in ansible_play_hosts | map('extract', hostvars, 'scale_cluster_quorum') | map('bool') | list
   with_sequence: start=1 end={{ [ ansible_play_hosts | length, 7 ] | min }}
   run_once: true
   delegate_to: "{{ ansible_play_hosts[item | int - 1] }}"
