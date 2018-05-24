@@ -14,7 +14,7 @@
 - name: yum-clean-metadata
   command: yum clean metadata
   args:
-    warn: no
+    warn: false
 
 - name: accept-server-licenses
   command: /usr/lpp/mmfs/bin/mmchlicense server --accept -N serverLicense

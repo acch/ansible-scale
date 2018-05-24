@@ -9,7 +9,7 @@
     name: spectrum-scale-gpfs
     description: IBM Spectrum Scale (GPFS)
     baseurl: "{{ scale_install_repository_url }}"
-    gpgcheck: no
+    gpgcheck: false
     state: present
   notify: yum-clean-metadata
   when: ansible_pkg_mgr == 'yum'
