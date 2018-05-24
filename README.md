@@ -5,14 +5,15 @@ Highly-customizable Ansible role for installing and configuring IBM Spectrum Sca
 
 Particularly looking for [feedback](https://github.com/acch/ansible-scale/issues) and future [requirements](https://github.com/acch/ansible-scale/issues/new)!
 
+
 Features
 --------
 
 - Install Spectrum Scale packages on Linux nodes
 - Optionally, verify package integrity by comparing checksums
-- Configure SSH public key authentication
-- Compile-, or install pre-compiled Linux kernel extension
 - Perform (offline) upgrade if daemon is stopped
+- Compile-, or install pre-compiled Linux kernel extension
+- Configure SSH public key authentication
 - Create new-, or extend existing cluster
 - Configure Network Shared Disks (NSDs)
 - Create new-, or extend existing file systems
@@ -27,7 +28,6 @@ The following installation methods are available:
 Future plans:
 - Install CES packages
 - Install GUI and zimon packages
-- Configure tiebreaker disk
 
 
 Installation
@@ -229,6 +229,7 @@ Troubleshooting
 This role stores configuration files in `/var/tmp` on the first host in the play. These configuration files are kept to determine if definitions have changed since the previous run, and to decide if it's necessary to run certain Spectrum Scale commands (again). When experiencing problems one can simply delete these configuration files from `/var/tmp` in order to clear the cache &mdash; this will force re-application of all definitions upon the next run. As a downside, the next run may take longer than expected as it might re-run unnecessary Spectrum Scale commands. Doing so will automatically re-generate the cache.
 
 Please use the [issue tracker](https://github.com/acch/ansible-scale/issues) to ask questions, report bugs and request features.
+
 
 Copyright and license
 ---------------------
