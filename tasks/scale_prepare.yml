@@ -46,6 +46,13 @@
 #
 # Exchange SSH keys
 #
+- name: prepare | Generate SSH key
+  vars:
+    privkey_path: "{{ scale_prepare_pubkey_path | regex_replace('.pub$', '') }}"
+  command: ssh-keygen -b 2048 -t rsa -N '' -f {{ privkey_path }}
+  args:
+    creates: "{{ privkey_path }}"
+
 - name: prepare | Read public SSH key
   slurp:
     src: "{{ scale_prepare_pubkey_path }}"

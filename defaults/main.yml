@@ -27,7 +27,8 @@ scale_architecture: "{{ ansible_architecture }}"
 scale_daemon_nodename: "{{ ansible_hostname }}"
 
 
-## Path to (existing) public SSH key - will be exchanged between nodes
+## Path to public SSH key - will be generated (if it does not exist) and
+## exchanged between nodes
 scale_prepare_pubkey_path: /root/.ssh/id_rsa.pub
 
 
