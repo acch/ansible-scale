@@ -49,9 +49,10 @@
 - name: prepare | Generate SSH key
   vars:
     privkey_path: "{{ scale_prepare_pubkey_path | regex_replace('.pub$', '') }}"
-  command: ssh-keygen -b 2048 -t rsa -N '' -f {{ privkey_path }}
-  args:
-    creates: "{{ privkey_path }}"
+  user:
+    name: root
+    generate_ssh_key: true
+    ssh_key_file: "{{ privkey_path }}"
 
 - name: prepare | Read public SSH key
   slurp:
