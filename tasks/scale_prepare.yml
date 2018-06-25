@@ -65,3 +65,13 @@
     key: "{{ hostvars[item].scale_prepare_pubkey.content | b64decode }}"
     state: present
   with_items: "{{ ansible_play_hosts }}"
+
+#
+# Disable firewall
+#
+- name: prepare | Stop and disable firewall
+  service:
+    name: firewalld
+    state: stopped
+    enabled: false
+  when: scale_prepare_disable_firewall

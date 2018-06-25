@@ -36,6 +36,11 @@ scale_reboot_automatic: true
 ## exchanged between nodes
 scale_prepare_pubkey_path: /root/.ssh/id_rsa.pub
 
+## Whether or not to disable Linux firewalld - if you need to keep firewalld
+## active then change this variable to 'false' and apply your custom firewall
+## rules prior to running this role (e.g. as pre_tasks)
+scale_prepare_disable_firewall: true
+
 
 ## Temporary directory to copy installation package to
 ## (local package installation method)
