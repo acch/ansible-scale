@@ -29,7 +29,7 @@ scale_daemon_nodename: "{{ ansible_hostname }}"
 ## Whether or not to automatically reboot nodes - if set to 'false' then only a
 ## message is printed. If set to 'true' then nodes are automatically rebooted
 ## (dangerous!)
-scale_reboot_automatic: true
+scale_reboot_automatic: false
 
 
 ## Path to public SSH key - will be generated (if it does not exist) and
