@@ -117,7 +117,7 @@ The above examples will install required packages and create a functional Spectr
 ---
 scale_storage:
   - filesystem: gpfs01
-    blockSize: 1M
+    blockSize: 4M
     defaultMetadataReplicas: 2
     defaultDataReplicas: 2
     numNodes: 16
@@ -182,6 +182,8 @@ scale_storage:
 
 Note that filesystem parameters can be defined as variables for *any* host in the play &mdash; the host for which you define the filesystem parameters is irrelevant. For disk parameters the host is only relevant if you omit the `servers` variable. When omitting the `servers` variable then the host for which you define the disk is automatically considered the (only) NSD server for that particular disk.
 
+> **Important**: `scale_storage` *must* be defined for individual host(s) using `host_vars` inventory files. Do *not* define disk parameters using `group_vars` inventory files or inline `vars:` in your playbook. Doing so would apply them to all hosts in the group/play, thus defining the same disk multiple times...
+
 Furthermore, Spectrum Scale node classes can be defined on a per-node basis by defining the `scale_nodeclass` variable:
 
 ```
@@ -207,7 +209,7 @@ These node classes can optionally be used to define Spectrum Scale configuration
 scale_config:
   - nodeclass: classA
     params:
-      - pagepool: 4G
+      - pagepool: 16G
       - autoload: no
       - ignorePrefetchLUNCount: yes
 ```
