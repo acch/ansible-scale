@@ -28,7 +28,7 @@
     host: "{{ ansible_default_ipv4.address }}"
     port: 22
     state: started
-    delay: 30
+    delay: 45
     timeout: 300
 
 - name: yum-clean-metadata
