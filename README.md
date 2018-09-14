@@ -1,7 +1,7 @@
 IBM Spectrum Scale (GPFS) Ansible Role
 ======================================
 
-[![GitHub Issues](https://img.shields.io/github/issues/acch/ansible-scale.svg)](https://github.com/acch/ansible-scale/issues) [![GitHub Stars](https://img.shields.io/github/stars/acch/ansible-scale.svg?label=github%20%E2%98%85)](https://github.com/acch/ansible-scale/) [![Role Downloads](https://img.shields.io/ansible/role/d/22821.svg)](https://galaxy.ansible.com/acch/spectrum-scale/) [![License](https://img.shields.io/github/license/acch/ansible-scale.svg)](LICENSE)
+[![GitHub Issues](https://img.shields.io/github/issues/acch/ansible-scale.svg)](https://github.com/acch/ansible-scale/issues) [![GitHub Stars](https://img.shields.io/github/stars/acch/ansible-scale.svg?label=github%20%E2%98%85)](https://github.com/acch/ansible-scale/) [![Role Downloads](https://img.shields.io/ansible/role/d/29538.svg)](https://galaxy.ansible.com/acch/spectrum_scale) [![License](https://img.shields.io/github/license/acch/ansible-scale.svg)](LICENSE)
 
 Highly-customizable Ansible role for installing and configuring IBM Spectrum Scale (GPFS)
 
