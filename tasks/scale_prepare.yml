@@ -75,3 +75,12 @@
     state: stopped
     enabled: false
   when: scale_prepare_disable_firewall
+
+#
+# Install prereq RPMs
+#
+- name: prepare | Install prerequisite RPMs
+  yum:
+    name: yum-utils
+    state: present
+  when: ansible_pkg_mgr == 'yum'
