@@ -36,7 +36,7 @@ Installation
 ------------
 
 ```
-$ ansible-galaxy install acch.spectrum-scale
+$ ansible-galaxy install acch.spectrum_scale
 ```
 
 
@@ -78,7 +78,7 @@ The simplest possible playbook to install Spectrum Scale on a node:
     - scale_version: 4.2.3.4
     - scale_install_localpkg_path: /path/to/Spectrum_Scale_Standard-4.2.3.4-x86_64-Linux-install
   roles:
-    - acch.spectrum-scale
+    - acch.spectrum_scale
 ```
 
 This will install all required packages and create a single-node Spectrum Scale cluster.
@@ -103,7 +103,7 @@ scale05  scale_cluster_quorum=false  scale_cluster_manager=false
     - scale_install_repository_url: http://infraserv/gpfs_rpms/
     - scale_cluster_clustername: cluster01.example.com
   roles:
-    - acch.spectrum-scale
+    - acch.spectrum_scale
 ```
 
 Refer to `defaults/main.yml` for a detailed explanation of possible variables and configuration options.
