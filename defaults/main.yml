@@ -13,11 +13,11 @@
 
 ## Specify the path to Spectrum Scale installation package on the remote system
 ## (accessible on Ansible managed node)
-#scale_install_remotepkg_path: /path/to/Spectrum_Scale_Standard-...-install
+#scale_install_remotepkg_path: /path/to/Spectrum_Scale_Standard-{{ scale_version }}-{{ ansible_architecture }}-Linux-install
 
 ## Specify the path to Spectrum Scale installation package on the local system
 ## (accessible on Ansible control machine) - it will be copied to your nodes
-#scale_install_localpkg_path: /path/to/Spectrum_Scale_Standard-...-install
+#scale_install_localpkg_path: /path/to/Spectrum_Scale_Standard-{{ scale_version }}-{{ ansible_architecture }}-Linux.-install
 
 
 ## Specify the Spectrum Scale architecture that you want to install on your nodes
@@ -50,9 +50,12 @@ scale_install_localpkg_tmpdir_path: /tmp
 scale_install_gpfs_rpms:
   - gpfs.base-{{ scale_rpmversion }}.{{ scale_architecture }}
   - gpfs.docs-{{ scale_rpmversion }}.noarch
-  - gpfs.ext-{{ scale_rpmversion }}.{{ scale_architecture }}
   - gpfs.msg.en_US-{{ scale_rpmversion }}.noarch
   # Appropriate gpfs.gskit version will be installed automatically
+
+## List of GPFS RPMs to install (prior to version 5.0.2.0)
+scale_install_add_rpms_pre502:
+  - gpfs.ext-{{ scale_rpmversion }}.{{ scale_architecture }}
 
 ## List of GPFS RPMs to install for building Linux kernel extension from source
 scale_install_gplsrc_rpms:
@@ -62,6 +65,8 @@ scale_install_gplsrc_rpms:
 ## Define this variable to install Linux kernel extension from pre-built RPM
 ## (instead of building it from source)
 #scale_install_gplbin_rpm: gpfs.gplbin-{{ ansible_kernel }}-{{ scale_rpmversion }}
+
+## Note that required RPM can be built with `mmbuildgpl --build-package`
 
 ## Specify the URL of the (existing) YUM repository from which to install
 ## pre-built Linux kernel extension RPM

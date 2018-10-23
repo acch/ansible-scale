@@ -127,6 +127,15 @@
     - "{{ scale_install_gpfs_rpms }}"
     - "{{ scale_install_gpfs_gskit.files.0.path | basename | regex_replace('\\.rpm$', '') }}"
 
+- name: install | Add GPFS RPMs to list (prior to version 5.0.2.0)
+  vars:
+    current_rpm: /usr/lpp/mmfs/{{ scale_version }}/gpfs_rpms/{{ item }}.rpm
+  set_fact:
+    scale_install_all_rpms: "{{ scale_install_all_rpms + [ current_rpm ] }}"
+  with_items:
+    - "{{ scale_install_add_rpms_pre502 }}"
+  when: scale_version is version_compare('5.0.2', '<=')
+
 #
 # Add GPFS RPMs for building GPL module from source
 #
