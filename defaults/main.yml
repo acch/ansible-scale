@@ -17,7 +17,7 @@
 
 ## Specify the path to Spectrum Scale installation package on the local system
 ## (accessible on Ansible control machine) - it will be copied to your nodes
-#scale_install_localpkg_path: /path/to/Spectrum_Scale_Standard-{{ scale_version }}-{{ ansible_architecture }}-Linux.-install
+#scale_install_localpkg_path: /path/to/Spectrum_Scale_Standard-{{ scale_version }}-{{ ansible_architecture }}-Linux-install
 
 
 ## Specify the Spectrum Scale architecture that you want to install on your nodes
