@@ -69,12 +69,20 @@
 #
 # Disable firewall
 #
+- name: prepare | List installed firewall RPMs
+  yum:
+    list: firewalld
+  register: scale_prepare_firewallrpm
+  when: ansible_pkg_mgr == 'yum'
+
 - name: prepare | Stop and disable firewall
   service:
     name: firewalld
     state: stopped
     enabled: false
-  when: scale_prepare_disable_firewall
+  when:
+    - scale_prepare_disable_firewall
+    - "'installed' in scale_prepare_firewallrpm.results | map(attribute='yumstate') | list"
 
 #
 # Install prereq RPMs
