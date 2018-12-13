@@ -46,25 +46,27 @@
 #
 # Exchange SSH keys
 #
-- name: prepare | Generate SSH key
-  vars:
-    privkey_path: "{{ scale_prepare_pubkey_path | regex_replace('.pub$', '') }}"
-  user:
-    name: root
-    generate_ssh_key: true
-    ssh_key_file: "{{ privkey_path }}"
+- block:  ## when: scale_prepare_exchange_keys
+    - name: prepare | Generate SSH key
+      vars:
+        privkey_path: "{{ scale_prepare_pubkey_path | regex_replace('.pub$', '') }}"
+      user:
+        name: root
+        generate_ssh_key: true
+        ssh_key_file: "{{ privkey_path }}"
 
-- name: prepare | Read public SSH key
-  slurp:
-    src: "{{ scale_prepare_pubkey_path }}"
-  register: scale_prepare_pubkey
+    - name: prepare | Read public SSH key
+      slurp:
+        src: "{{ scale_prepare_pubkey_path }}"
+      register: scale_prepare_pubkey
 
-- name: prepare | Authorize all SSH keys
-  authorized_key:
-    user: root
-    key: "{{ hostvars[item].scale_prepare_pubkey.content | b64decode }}"
-    state: present
-  with_items: "{{ ansible_play_hosts }}"
+    - name: prepare | Authorize all SSH keys
+      authorized_key:
+        user: root
+        key: "{{ hostvars[item].scale_prepare_pubkey.content | b64decode }}"
+        state: present
+      with_items: "{{ ansible_play_hosts }}"
+  when: scale_prepare_exchange_keys
 
 #
 # Disable firewall

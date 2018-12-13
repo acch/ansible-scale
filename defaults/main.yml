@@ -35,6 +35,9 @@ scale_daemon_nodename: "{{ ansible_hostname }}"
 scale_reboot_automatic: false
 
 
+## Whether or not to exchange SSH keys between nodes
+scale_prepare_exchange_keys: true
+
 ## Path to public SSH key - will be generated (if it does not exist) and
 ## exchanged between nodes
 scale_prepare_pubkey_path: /root/.ssh/id_rsa.pub
