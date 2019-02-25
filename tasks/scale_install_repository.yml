@@ -12,7 +12,9 @@
     gpgcheck: false
     state: present
   notify: yum-clean-metadata
-  when: ansible_pkg_mgr == 'yum'
+  when:
+    - ansible_pkg_mgr == 'yum'
+    - scale_install_repository_url != 'existing'
 
 #
 # Add GPFS RPMs

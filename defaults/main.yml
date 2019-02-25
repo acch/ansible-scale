@@ -10,6 +10,9 @@
 ## Specify the URL of the (existing) Spectrum Scale YUM repository
 ## (copy the contents of /usr/lpp/mmfs/.../gpfs_rpms to build your repository)
 #scale_install_repository_url: http://infraserv/gpfs_rpms/
+## Note that if this is a URL then a new repository definition will be created.
+## If this variable is set to 'existing' then it is assumed that a repository
+## definition already exists and thus will *not* be created.
 
 ## Specify the path to Spectrum Scale installation package on the remote system
 ## (accessible on Ansible managed node)
@@ -31,6 +34,9 @@ scale_daemon_nodename: "{{ ansible_hostname }}"
 ## (dangerous!)
 scale_reboot_automatic: false
 
+
+## Whether or not to exchange SSH keys between nodes
+scale_prepare_exchange_keys: true
 
 ## Path to public SSH key - will be generated (if it does not exist) and
 ## exchanged between nodes
