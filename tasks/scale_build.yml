@@ -7,10 +7,9 @@
 #
     - name: build | Install prereqs for building GPL module from source
       yum:
-        name: "{{ item }}"
+        name: "{{ scale_build_gplsrc_prereqs }}"
         state: present
       when: ansible_pkg_mgr == 'yum'
-      with_items: "{{ scale_build_gplsrc_prereqs }}"
 
 #
 # Identify Linux Distribution
