@@ -49,11 +49,6 @@ scale_prepare_enable_ssh_login: true
 scale_prepare_disable_ssh_hostkeycheck: true
 
 
-## TODO In envrionment where security is allready handle.
-## this dont Exchange SSH keys, Disable SELinux, Enable SSH root login, Enable SSH pubkey authentication, Disable SSH hostkey checking
-## scale_prepare_secure_environment: true
-
-
 ## Path to public SSH key - will be generated (if it does not exist) and
 ## exchanged between nodes
 scale_prepare_pubkey_path: /root/.ssh/id_rsa.pub
