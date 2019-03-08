@@ -4,7 +4,7 @@
   selinux:
     state: disabled
   notify: reboot
-  when: scale_prepare_selinux_disable
+  when: scale_prepare_disable_selinux
 
 - name: prepare | Add Spectrum Scale directory to PATH
   lineinfile:
