@@ -1,10 +1,10 @@
 ---
 # Prepare node for installation
-
 - name: prepare | Disable SELinux
   selinux:
     state: disabled
   notify: reboot
+  when: scale_prepare_selinux_disable
 
 - name: prepare | Add Spectrum Scale directory to PATH
   lineinfile:
@@ -15,21 +15,23 @@
 #
 # Configure SSH server
 #
-- name: prepare | Enable SSH root login
-  lineinfile:
-    path: /etc/ssh/sshd_config
-    regexp: PermitRootLogin
-    line: PermitRootLogin yes
-    state: present
-  notify: reload-sshd
+- block:  ## when: scale_prepare_enable_ssh_login
+    - name: prepare | Enable SSH root login
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: PermitRootLogin
+        line: PermitRootLogin yes
+        state: present
+      notify: reload-sshd
 
-- name: prepare | Enable SSH pubkey authentication
-  lineinfile:
-    path: /etc/ssh/sshd_config
-    regexp: PubkeyAuthentication
-    line: PubkeyAuthentication yes
-    state: present
-  notify: reload-sshd
+    - name: prepare | Enable SSH pubkey authentication
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: PubkeyAuthentication
+        line: PubkeyAuthentication yes
+        state: present
+      notify: reload-sshd
+  when: scale_prepare_enable_ssh_login
 
 - meta: flush_handlers
 
@@ -42,7 +44,7 @@
     regexp: StrictHostKeyChecking
     line: StrictHostKeyChecking no
     state: present
-
+  when: scale_prepare_disable_ssh_hostkeycheck
 #
 # Exchange SSH keys
 #

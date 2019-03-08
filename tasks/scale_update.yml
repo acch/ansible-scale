@@ -16,12 +16,13 @@
       vars:
         msg: |-
           ######################################################################
-          Spectrum Scale is running. Please stop it for an automatic offline
-          update, or manually perform an online update (by taking down one node
-          at a time)!
+          Spectrum Scale is running, Please stop it for an automatic offline update,
+          or manually perform an online update (by taking down one node at a time)!
+          Current version: {{ scale_current_version.stdout }}
+          Available version for update: {{ scale_version }}
           ######################################################################
       assert:
         that:
           - true not in ansible_play_hosts | map('extract', hostvars, 'scale_install_needsupdate') | list
-        msg: "{{ msg.split('\n') }}"
+        msg: "{{ msg }}"
   run_once: true
