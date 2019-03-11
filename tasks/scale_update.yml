@@ -16,13 +16,13 @@
       vars:
         msg: |-
           ######################################################################
-          Spectrum Scale current version is "{{ scale_current_version.stdout }}" available version for upgrade "{{ scale_version }}"
           Spectrum Scale is running, Please stop it for an automatic offline update,
           or manually perform an online update (by taking down one node at a time)!
+          Current version: {{ scale_current_version.stdout }}
+          Available version for update: {{ scale_version }}
           ######################################################################
       assert:
         that:
           - true not in ansible_play_hosts | map('extract', hostvars, 'scale_install_needsupdate') | list
         msg: "{{ msg }}"
-        ##todo regression: assert msg no longer accepts list #48547 Another option to configure this is to add stdout_callback = debug to your ansible.cfg
   run_once: true
