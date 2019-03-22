@@ -1,0 +1,6 @@
+language: python
+dist: xenial
+
+install: pip install ansible-lint
+
+script: ansible-lint .
