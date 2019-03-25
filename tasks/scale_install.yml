@@ -29,7 +29,7 @@
     - name: install | Check installation method
       assert:
         that: scale_installmethod is defined
-        msg: >-
+        fail_msg: >-
           Please set the appropriate variable 'scale_install_*' for your desired
           installation method!
   run_once: true

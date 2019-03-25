@@ -29,7 +29,7 @@
     - name: check | Check Linux distribution
       assert:
         that: scale_build_distribution is defined
-        msg: >-
+        fail_msg: >-
           Unsupported Linux distribution {{ ansible_distribution }}!
 
 #
@@ -48,7 +48,7 @@
     - name: build | Check GPL module
       assert:
         that: scale_build_kmod.stat.exists
-        msg: >-
+        fail_msg: >-
           Unable to build Linux kernel extension for running kernel
           {{ ansible_kernel }}!
   when: scale_install_gplbin_rpm is undefined
