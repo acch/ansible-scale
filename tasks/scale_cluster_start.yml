@@ -32,8 +32,9 @@
           command: /usr/lpp/mmfs/bin/mmchnode -S /var/tmp/ChangeFile
           notify: accept-licenses
 
-        - meta: flush_handlers
       when: scale_storage_changefile is changed
   when: groups['scale_cluster_members'] is defined
   run_once: true
   delegate_to: "{{ groups['scale_cluster_members'].0 }}"
+
+- meta: flush_handlers
