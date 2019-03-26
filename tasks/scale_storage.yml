@@ -45,8 +45,10 @@
 
 - name: storage | Find defined NSDs
   set_fact:
-    scale_storage_nsddefs: "{{ scale_storage_nsddefs | default([]) + [ item.1.nsd | default('nsd_' + scale_daemon_nodename + '_' + item.1.device | basename) ] }}"
-    scale_storage_nsdservers: "{{ scale_storage_nsdservers | default([]) + [ item.1.servers | default(scale_daemon_nodename) ] }}"
+    scale_storage_nsddefs:
+      "{{ scale_storage_nsddefs | default([]) + [ item.1.nsd | default('nsd_' + scale_daemon_nodename + '_' + item.1.device | basename) ] }}"
+    scale_storage_nsdservers:
+      "{{ scale_storage_nsdservers | default([]) + [ item.1.servers | default(scale_daemon_nodename) ] }}"
   when:
     - item.1.device is defined
   with_subelements:
@@ -56,13 +58,17 @@
 - block:  ## run_once: true
     - name: storage | Consolidate defined NSDs
       set_fact:
-        scale_storage_nsddefs: "{{ ansible_play_hosts | map('extract', hostvars, 'scale_storage_nsddefs') | sum(start=[]) }}"
-        scale_storage_nsdservers: "{% set nsdservers=ansible_play_hosts | map('extract', hostvars, 'scale_storage_nsdservers') | sum(start=[]) | join(',') %}{{ nsdservers.split(',') | unique }}"
-        scale_storage_fsdefs: "{{ ansible_play_hosts | map('extract', hostvars, 'scale_storage') | sum(start=[]) | map(attribute='filesystem') | list | unique }}"
+        scale_storage_nsddefs:
+          "{{ ansible_play_hosts | map('extract', hostvars, 'scale_storage_nsddefs') | sum(start=[]) }}"
+        scale_storage_nsdservers:
+          "{{ ansible_play_hosts | map('extract', hostvars, 'scale_storage_nsdservers') | sum(start=[]) | unique }}"
+        scale_storage_fsdefs:
+          "{{ ansible_play_hosts | map('extract', hostvars, 'scale_storage') | sum(start=[]) | map(attribute='filesystem') | list | unique }}"
 
     - name: storage | Consolidate defined filesystem parameters
       set_fact:
-        scale_storage_fsparams: "{{ scale_storage_fsparams | default({}) | combine({ item.filesystem:item }, recursive=true) }}"
+        scale_storage_fsparams:
+          "{{ scale_storage_fsparams | default({}) | combine({ item.filesystem:item }, recursive=true) }}"
       with_items: "{{ ansible_play_hosts | map('extract', hostvars, 'scale_storage') | sum(start=[]) }}"
 
 #
@@ -71,7 +77,9 @@
     - name: storage | Prepare StanzaFile(s) for NSD creation
       vars:
         current_fs: "{{ item }}"
-        current_nsds: "{{ scale_storage_nsddefs | difference(scale_storage_existing_nsds.stdout_lines) }}"  ## only non-existing NSDs
+        current_nsds:
+          # only non-existing NSDs
+          "{{ scale_storage_nsddefs | difference(scale_storage_existing_nsds.stdout_lines) }}"
       template:
         src: StanzaFile.j2
         dest: /var/tmp/StanzaFile.new.{{ current_fs }}
@@ -97,7 +105,9 @@
     - name: storage | Prepare StanzaFile(s) for filesystem creation
       vars:
         current_fs: "{{ item }}"
-        current_nsds: "{{ scale_storage_nsddefs }}"  ## all defined NSDs
+        current_nsds:
+          # all defined NSDs
+          "{{ scale_storage_nsddefs }}"
       template:
         src: StanzaFile.j2
         dest: /var/tmp/StanzaFile.new.{{ current_fs }}
@@ -107,7 +117,7 @@
       with_items: "{{ scale_storage_fsdefs }}"
 
     - name: storage | Create new filesystem(s)
-      command: >
+      command:
         /usr/lpp/mmfs/bin/mmcrfs {{ item.item }}
         -F /var/tmp/StanzaFile.new.{{ item.item }}
         -B {{ scale_storage_fsparams[item.item].blockSize | default(scale_storage_filesystem_defaults.blockSize) }}
@@ -135,7 +145,9 @@
     - name: storage | Prepare StanzaFile(s) for filesystem extension
       vars:
         current_fs: "{{ item }}"
-        current_nsds: "{{ scale_storage_nsddefs | difference(scale_storage_existing_nsds.stdout_lines) | union(scale_storage_free_nsds.stdout_lines) }}"  ## only non-existing and free NSDs
+        current_nsds:
+          # only non-existing and free NSDs
+          "{{ scale_storage_nsddefs | difference(scale_storage_existing_nsds.stdout_lines) | union(scale_storage_free_nsds.stdout_lines) }}"
       template:
         src: StanzaFile.j2
         dest: /var/tmp/StanzaFile.new.{{ current_fs }}
@@ -166,7 +178,9 @@
     - name: storage | Prepare existing NSD StanzaFile(s)
       vars:
         current_fs: "{{ item }}"
-        current_nsds: "{{ scale_storage_existing_nsds.stdout_lines }}"  ## only existing NSDs
+        current_nsds:
+          # only existing NSDs
+          "{{ scale_storage_existing_nsds.stdout_lines }}"
       template:
         src: StanzaFile.j2
         dest: /var/tmp/StanzaFile.{{ current_fs }}
@@ -241,7 +255,9 @@
     - name: storage | Prepare existing NSD StanzaFile(s) for next run
       vars:
         current_fs: "{{ item }}"
-        current_nsds: "{{ scale_storage_nsddefs }}"  ## all defined NSDs
+        current_nsds:
+          # all defined NSDs
+          "{{ scale_storage_nsddefs }}"
       template:
         src: StanzaFile.j2
         dest: /var/tmp/StanzaFile.{{ current_fs }}
@@ -264,7 +280,7 @@
       with_dict: "{{ scale_storage_fsparams | default({}) }}"
 
     - name: storage | Change online filesystem parameters
-      command: >
+      command:
         /usr/lpp/mmfs/bin/mmchfs {{ item.key }}
         -m {{ item.value.defaultMetadataReplicas | default(scale_storage_filesystem_defaults.defaultMetadataReplicas) }}
         -r {{ item.value.defaultDataReplicas | default(scale_storage_filesystem_defaults.defaultDataReplicas) }}
@@ -275,7 +291,7 @@
       with_dict: "{{ scale_storage_fsparams | default({}) }}"
 
     - name: storage | Change offline filesystem parameters
-      command: >
+      command:
         /usr/lpp/mmfs/bin/mmchfs {{ item.key }}
         -T {{ item.value.defaultMountPoint | default(scale_storage_filesystem_defaults.defaultMountPoint_prefix + item.key) }}
       when:
