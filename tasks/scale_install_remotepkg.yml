@@ -9,7 +9,7 @@
 - name: install | Check remote installation package
   assert:
     that: scale_install_remotepkg.stat.exists
-    fail_msg: >-
+    msg: >-
       Please set the variable 'scale_install_remotepkg_path' to point to the
       remote installation package (accessible on Ansible managed node)!
 
@@ -32,7 +32,7 @@
         md5sum: "{{ scale_install_md5_sum.content | b64decode }}"
       assert:
         that: md5sum.strip().split().0 == scale_install_remotepkg.stat.md5
-        fail_msg: >-
+        msg: >-
           Checksums don't match. Please check integritiy of your remote
           installation package!
   when: scale_install_md5_file.stat.exists
@@ -66,7 +66,7 @@
     that:
       - scale_install_gpfs_rpmdir.stat.exists
       - scale_install_gpfs_rpmdir.stat.isdir
-    fail_msg: >-
+    msg: >-
       The variable 'scale_version' doesn't seem to match the contents of the
       remote installation package!
 
@@ -82,7 +82,7 @@
 - name: install | Check valid Global Security Kit (GSKit) RPM
   assert:
     that: scale_install_gpfs_gskit.matched > 0
-    fail_msg: >-
+    msg: >-
       No Global Security Kit (GSKit) RPM found:
       /usr/lpp/mmfs/{{ scale_version }}/gpfs_rpms/gpfs.gskit-*.{{ scale_architecture }}.rpm
 
