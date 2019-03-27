@@ -76,8 +76,6 @@
       command: /usr/lpp/mmfs/bin/mmcrcluster -N /var/tmp/NodeFile -C {{ scale_cluster_clustername }}
       notify: accept-licenses
 
-    - meta: flush_handlers
-
     - name: cluster | Cleanup new cluster NodeFile
       file:
         path: /var/tmp/NodeFile
@@ -106,8 +104,6 @@
       command: /usr/lpp/mmfs/bin/mmaddnode -N /var/tmp/NodeFile
       notify: accept-licenses
 
-    - meta: flush_handlers
-
     - name: cluster | Cleanup existing cluster NodeFile
       file:
         path: /var/tmp/NodeFile
@@ -117,5 +113,7 @@
     - groups['scale_cluster_members'] is defined
   run_once: true
   delegate_to: "{{ groups['scale_cluster_members'].0 }}"
+
+- meta: flush_handlers
 
 # Node roles will be finalized after daemons are started...
