@@ -24,5 +24,10 @@
       assert:
         that:
           - true not in ansible_play_hosts | map('extract', hostvars, 'scale_install_needsupdate') | list
-        msg: "{{ msg.split('\n') }}"
+        #msg: "{{ msg.split('\n') }}"
+        # Temporary workaround for Ansible bug #48547
+        # This will basically make the error message unreadable - but there's an
+        # alternative solution to that:
+        # https://www.jeffgeerling.com/blog/2018/use-ansibles-yaml-callback-plugin-better-cli-experience
+        msg: "{{ msg }}"
   run_once: true
