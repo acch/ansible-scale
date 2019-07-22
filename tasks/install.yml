@@ -53,7 +53,7 @@
 # Fail upon online update
 #
 - include_tasks: update.yml
-  when: scale_daemon_running
+  when: scale_daemon_running | bool
 
 #
 # Install or update RPMs
