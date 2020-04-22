@@ -42,9 +42,9 @@
   set_fact:
     scale_install_all_rpms: []
 
-- include_tasks: scale_install_{{ scale_installmethod }}.yml
+- include_tasks: install_{{ scale_installmethod }}.yml
 
-- include_tasks: scale_install_gplbin.yml
+- include_tasks: install_gplbin.yml
   when: scale_install_gplbin_rpm is defined
 
 - meta: flush_handlers
@@ -52,8 +52,8 @@
 #
 # Fail upon online update
 #
-- include_tasks: scale_update.yml
-  when: scale_daemon_running
+- include_tasks: update.yml
+  when: scale_daemon_running | bool
 
 #
 # Install or update RPMs

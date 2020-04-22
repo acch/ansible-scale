@@ -1,29 +1,29 @@
 ---
 # Install and configure IBM Spectrum Scale (GPFS)
 
-- import_tasks: scale_check.yml
+- import_tasks: check.yml
   tags: always
 
-- import_tasks: scale_prepare.yml
+- import_tasks: prepare.yml
   tags: prepare
 
-- import_tasks: scale_install.yml
+- import_tasks: install.yml
   tags: install
 
-- import_tasks: scale_build.yml
+- import_tasks: build.yml
   tags: build
 
-- import_tasks: scale_cluster.yml
+- import_tasks: cluster.yml
   tags: cluster
 
-- import_tasks: scale_config.yml
+- import_tasks: config.yml
   tags: config
 
-- import_tasks: scale_cluster_start.yml
+- import_tasks: cluster_start.yml
   tags: cluster
 
-- import_tasks: scale_storage.yml
+- import_tasks: storage.yml
   tags: storage
 
-- import_tasks: scale_finalize.yml
+- import_tasks: finalize.yml
   tags: always
