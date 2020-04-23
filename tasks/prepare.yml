@@ -77,7 +77,7 @@
   yum:
     list: firewalld
   register: scale_prepare_firewallrpm
-  when: ansible_pkg_mgr == 'yum'
+  when: ansible_pkg_mgr == 'yum' or ansible_pkg_mgr == 'dnf'
 
 - name: prepare | Stop and disable firewall
   service:
@@ -95,4 +95,4 @@
   yum:
     name: yum-utils
     state: present
-  when: ansible_pkg_mgr == 'yum'
+  when: ansible_pkg_mgr == 'yum' or ansible_pkg_mgr == 'dnf'

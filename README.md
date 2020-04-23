@@ -45,6 +45,27 @@ Requirements
 
 As there's no public repository available, you'll need to download Spectrum Scale (GPFS) packages from the IBM website. Visit https://www.ibm.com/support/fixcentral and search for 'IBM Spectrum Scale (Software defined storage)'.
 
+#####**IBM Spectrum Scale Developer Edition**
+If you don't have an subscription you can now download the IBM Spectrum Scale Developer Edition
+- This edition provides all the features of the IBM Spectrum Scale Data Management Edition but it is limited to 12 TB per cluster.
+- There is no support from IBM for IBM Spectrum Scale Developer Edition.  Additionally, use in a production environment is prohibited. 
+- The Developer Edition can be access via https://www.ibm.com/us-en/marketplace/scale-out-file-and-object-storage
+
+
+Local Spectrum Scale Repo
+-------
+Example: Create a local repo on a web server:
+
+```
+cd /your/webserver/folder
+# Download the Spectrum Scale install files. get directlink or copy it into your server 
+wget ------Spectrum Scale Binary -----
+sh ./Spectrum_Scale_Data_Management-5.0.X.X-x86_64-Linux-install --dir ./SpectrumScaleRpms/5.0.X.X/ --silent
+yum install -y createrepo
+cd SpectrumScaleRpms/5.0.X.X/
+createrepo .
+```
+
 
 Role Variables
 --------------

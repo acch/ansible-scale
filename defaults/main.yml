@@ -98,6 +98,12 @@ scale_build_gplsrc_prereqs:
   - kernel-devel
   - make
 
+scale_build_gplsrc_prereqs_el8:
+  - gcc-c++
+  - kernel-devel
+  - make
+  - elfutils-libelf-devel
+# Rhel8 need the elfutils-libelf-devel
 
 ## Default cluster name
 scale_cluster_clustername: gpfs1.local
