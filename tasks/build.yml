@@ -5,11 +5,23 @@
 #
 # Install gplsrc prereqs
 #
-    - name: build | Install prereqs for building GPL module from source
+    - name: build | Install prereqs for building GPL module from source - el7
       yum:
         name: "{{ scale_build_gplsrc_prereqs }}"
         state: present
-      when: ansible_pkg_mgr == 'yum'
+      when:
+        - ansible_distribution_major_version == '7'
+        - ansible_pkg_mgr == 'yum' or ansible_pkg_mgr == 'dnf'
+#
+# Install gplsrc prereqs
+#
+    - name: build | Install prereqs for building GPL module from source - el8
+      yum:
+        name: "{{ scale_build_gplsrc_prereqs_el8 }}"
+        state: present
+      when:
+        - ansible_distribution_major_version == '8'
+        - ansible_pkg_mgr == 'yum' or ansible_pkg_mgr == 'dnf'
 
 #
 # Identify Linux Distribution

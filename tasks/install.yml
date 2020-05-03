@@ -64,14 +64,14 @@
         list: gpfs.base
         disablerepo: spectrum-scale-gpfs
       register: scale_install_rpmlist
-      when: ansible_pkg_mgr == 'yum'
+      when: ansible_pkg_mgr == 'yum' or ansible_pkg_mgr == 'dnf'
 
     - name: install | Install GPFS RPMs
       yum:
         name: "{{ scale_install_all_rpms }}"
         state: present
       register: scale_install_rpmresult
-      when: ansible_pkg_mgr == 'yum'
+      when: ansible_pkg_mgr == 'yum' or ansible_pkg_mgr == 'dnf'
 
     - name: install | Check if GPFS RPMs were updated
       set_fact:
