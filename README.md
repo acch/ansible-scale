@@ -1,3 +1,10 @@
+
+---
+
+> **IMPORTANT**: Unfortunately, this project is no longer actively maintained by its original creator(s). The code has been merged into the "official" [IBM/ibm-spectrum-scale-install-infra](https://github.com/IBM/ibm-spectrum-scale-install-infra/) project — which is where all future development will take place. While this (original) project may no longer receive updates or support, the codebase remains accessible and available for anyone interested in continuing its development.
+
+---
+
 IBM Spectrum Scale (GPFS) Ansible Role
 ======================================
 
